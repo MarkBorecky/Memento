@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matrix Input</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: #000;
+            color: #0f0;
+            font-family: monospace;
+            font-size: 16px;
+        }
+        .matrix {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+        .matrix span {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            color: rgba(0, 255, 0, 0.21);
+            font-size: 16px;
+            white-space: nowrap;
+        }
+        .input-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        input {
+            font-size: 72px;
+            padding: 10px;
+            border: 2px solid #0f0;
+            background: rgba(0, 0, 0, 0.8);
+            color: #0a0;
+            border-radius: 5px;
+            font-family: 'Courier New', Courier, monospace;
+            outline: none;
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+        }
+        .input-label {
+            display: block;
+            font-size: 36px;
+            color: rgba(0, 170, 0, 0.65);
+            margin-bottom: 20px;
+            font-family: 'Courier New', Courier, monospace;
+
+        }
+        .shake {
+            animation: shake 0.5s ease;
+        }
+
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            50% { transform: translateX(10px); }
+            75% { transform: translateX(-10px); }
+            100% { transform: translateX(0); }
+        }
+
+        @keyframes fadeOutText {
+            from {
+                color: #0a0; /* Kolor początkowy */
+            }
+            to {
+                color: rgba(0, 0, 0, 0); /* Kolor końcowy (przezroczysty) */
+            }
+        }
+
+        .fade-out-text {
+            animation: fadeOutText 3s forwards;
+        }
+
+    </style>
+</head>
+<body>
+<div class="matrix" id="matrix"></div>
+<div class="input-container">
+    <label id="label" class="input-label"></label>
+    <input type="text" id="matrixInput" oninput="handleChange()" onkeydown="handleKeyDown(event)" />
+</div>
+
+<script>
+    // Function to create falling characters
+    function createMatrix() {
+        const matrix = document.getElementById('matrix');
+        const chars = 'あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをんカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
+        const numCols = Math.floor(window.innerWidth / 20);
+        const numRows = Math.floor(window.innerHeight / 20);
+
+        for (let i = 0; i < numCols; i++) {
+            for (let j = 0; j < numRows; j++) {
+                const span = document.createElement('span');
+                span.textContent = chars.charAt(Math.floor(Math.random() * chars.length));
+                span.style.left = `${i * 20}px`;
+                span.style.top = `${j * 20}px`;
+                matrix.appendChild(span);
+
+                const speed = Math.random() * 5 + 1;
+                const animate = () => {
+                    let top = parseFloat(span.style.top);
+                    if (top > window.innerHeight) {
+                        top = -20;
+                    }
+                    span.style.top = `${top + speed}px`;
+                    requestAnimationFrame(animate);
+                };
+                animate();
+            }
+        }
+    }
+
+    const words = [
+        {
+            "label": "lek przeciwgorączkowy",
+            "translation": "en febernedsättande medicin"
+        },
+        {
+            "label": "wylew",
+            "translation": "en hjärnblödning"
+        },
+    ]
+
+    let wordIndex = 0;
+
+    let word = nextWord();
+    let currentInput = '';
+
+    document.getElementById('label').textContent = word.label;
+
+    createMatrix();
+
+    // Handle input change
+    function handleChange() {
+        const input = document.getElementById('matrixInput');
+        currentInput = input.value;
+        if (word.translation === currentInput) {
+            fadeOutText()
+            setTimeout(() => {
+                word = nextWord();
+                document.getElementById('label').textContent = word.label;
+            }, 3000);
+        } else if (word.translation.startsWith(currentInput)) {
+            input.style.color = '#0a0';
+        } else {
+            input.style.color = '#a00';
+        }
+    }
+
+    function nextWord() {
+        setTimeout(() => {
+            document.getElementById('matrixInput').value = '';
+        }, 3000); // Czas trwania animacji (w ms)
+
+        return  words[wordIndex++%words.length];
+    }
+
+    function fadeOutText() {
+        const input = document.getElementById('matrixInput');
+        const label = document.getElementById('label');
+
+        const elements = [input, label];
+
+        elements.forEach(el => el.classList.add('fade-out-text'))
+
+        setTimeout(() => {
+            input.value = ''; // Czyści pole tekstowe, ale pole zostaje
+            elements.forEach(el => el.classList.remove('fade-out-text'))
+        }, 3000); // Dopasuj czas do długości animacji
+    }
+
+    // Handle Enter key press
+    function handleKeyDown(event) {
+        if (event.key !== 'Enter') {
+            return;
+        }
+
+        if (word.translation !== currentInput) {
+            shake()
+            return;
+        }
+
+        nextWord();
+        word = words[wordIndex++%words.length];
+
+    }
+
+    function shake() {
+        // Dodaj klasę shake
+        let element = document.getElementById("matrixInput");
+        element.classList.add('shake');
+
+        // Usuń klasę shake po zakończeniu animacji
+        setTimeout(() => {
+            element.classList.remove('shake');
+        }, 500); // Czas trwania animacji (w ms)
+    }
+</script>
+</body>
+</html>
