@@ -1,0 +1,73 @@
+body {
+    margin: 0;
+    overflow: hidden;
+    background: #000;
+    color: #0f0;
+    font-family: monospace;
+    font-size: 16px;
+}
+.matrix {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+.matrix span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    color: rgba(0, 255, 0, 0.21);
+    font-size: 16px;
+    white-space: nowrap;
+}
+.input-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+input {
+    font-size: 72px;
+    padding: 10px;
+    border: 2px solid #0f0;
+    background: rgba(0, 0, 0, 0.8);
+    color: #0a0;
+    border-radius: 5px;
+    font-family: 'Courier New', Courier, monospace;
+    outline: none;
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+}
+.input-label {
+    display: block;
+    font-size: 36px;
+    color: rgba(0, 170, 0, 0.65);
+    margin-bottom: 20px;
+    font-family: 'Courier New', Courier, monospace;
+
+}
+.shake {
+    animation: shake 0.5s ease;
+}
+
+@keyframes shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-10px); }
+    50% { transform: translateX(10px); }
+    75% { transform: translateX(-10px); }
+    100% { transform: translateX(0); }
+}
+
+@keyframes fadeOutText {
+    from {
+        color: #0a0; /* Kolor początkowy */
+    }
+    to {
+        color: rgba(0, 0, 0, 0); /* Kolor końcowy (przezroczysty) */
+    }
+}
+
+.fade-out-text {
+    animation: fadeOutText 3s forwards;
+}
