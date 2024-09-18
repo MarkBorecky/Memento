@@ -28,16 +28,49 @@ body {
     left: 50%;
     transform: translate(-50%, -50%);
 }
-input {
-    font-size: 72px;
+
+#words {
+    position: absolute;
+    top: 5%;
+    left: 5%;
+    height: 110%; /* Wysokość kontenera */
+    width: 90%; /* Szerokość kontenera */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    pointer-events: auto; /* Zezwala na interakcje */
+}
+
+#wordsInput {
+    width: 100%; /* Szerokość inputa równa szerokości kontenera */
+    height: 70%; /* Wysokość inputa 70% */
+    font-size: 2rem; /* Duży tekst */
     padding: 10px;
     border: 2px solid #0f0;
     background: rgba(0, 0, 0, 0.8);
     color: #0a0;
+    outline: none;
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+    resize: none; /* Wyłącz możliwość zmiany rozmiaru pola */
+    overflow-wrap: break-word; /* Zawijanie linii */
+    white-space: pre-wrap; /* Zachowanie wcięć i nowej linii */
+}
+input {
+    padding: 10px;
+    border: 2px solid #0f0;
+    background: rgba(0, 0, 0, 0.8);
+    color: #0a0;
+}
+
+#matrixInput {
+    font-size: 72px;
     border-radius: 5px;
     font-family: 'Courier New', Courier, monospace;
     outline: none;
     box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+    pointer-events: auto; /* Zezwala na interakcje */
+    overflow-wrap: break-word; /* Zawijanie linii */
+    white-space: pre-wrap; 
 }
 .input-label {
     display: block;
@@ -70,4 +103,12 @@ input {
 
 .fade-out-text {
     animation: fadeOutText 3s forwards;
+}
+
+button {
+    padding: 10px;
+    border: 2px solid #0f0;
+    background: rgba(0, 0, 0, 0.8);
+    color: #0a0;
+    pointer-events: auto; /* Upewnij się, że przycisk reaguje na kliknięcia */
 }
