@@ -18,7 +18,7 @@ body {
     position: absolute;
     width: 1px;
     height: 1px;
-    color: rgba(0, 255, 0, 0.21);
+    /*color: rgba(0, 255, 0, 0.21);*/
     font-size: 16px;
     white-space: nowrap;
 }
@@ -92,17 +92,37 @@ input {
     100% { transform: translateX(0); }
 }
 
-@keyframes fadeOutText {
+/*@keyframes fadeOutText {*/
+/*    from {*/
+/*        color: #0a0; !* Kolor początkowy *!*/
+/*    }*/
+/*    to {*/
+/*        color: rgba(0, 0, 0, 0); !* Kolor końcowy (przezroczysty) *!*/
+/*    }*/
+/*}*/
+
+/*.fade-out-text {*/
+/*    animation: fadeOutText 3s forwards;*/
+/*}*/
+
+.rain {
+    color: rgba(0, 0, 0, 0)
+}
+
+@keyframes fadeOutRain {
     from {
-        color: #0a0; /* Kolor początkowy */
+        color: white; /* Kolor początkowy */
+    }
+    10% {
+        color: lime;
     }
     to {
-        color: rgba(0, 0, 0, 0); /* Kolor końcowy (przezroczysty) */
+        color: black; /* Kolor końcowy (przezroczysty) */
     }
 }
 
-.fade-out-text {
-    animation: fadeOutText 3s forwards;
+.fade-out-rain {
+    animation: fadeOutRain 5s none;
 }
 
 button {

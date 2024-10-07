@@ -1,12 +1,11 @@
  // Function to create falling characters
  const createMatrix = () => {
     const matrix = document.getElementById('matrix');
-    const chars = 'あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをんカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
+    // const chars = 'あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをんカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
+    const chars = 'Dobranoc!!!';
     // const numCols = Math.floor(window.innerWidth / 20);
 
-    const left = Math.floor(Math.random() * window.innerWidth); 
-
-console.log('left', left)
+    const left = Math.floor(Math.random() * window.innerWidth);
 
     const column = createColumn(left, matrix);
 
@@ -16,6 +15,8 @@ console.log('left', left)
 
     
 }
+
+const randomInterval = () => Math.floor(Math.random * 1000);
 
 const createColumn = (left, matrix) => {
     const maxTop = window.innerHeight;
@@ -33,12 +34,24 @@ const createColumn = (left, matrix) => {
         id: left,
         cells: cells,
         print: (text) => {
-            console.log('print')
             let index = 0;
-            for (const char of text) {
-                const cellId = index++ % cells.length;
-                cells[cellId].cell.textContent = char;
+            const interval = randomInterval();
+            const printCharacter = (index, text) => {
+                if (text.length >= 1) {
+                    setTimeout(() => {
+                        const cell = cells[index++ % cells.length].cell;
+                        cell.textContent = text.substring(0, 1);
+                        cell.classList.add("fade-out-rain");
+                        setTimeout(() => cell.textContent = '', 5000);
+                        setTimeout(() => cell.classList.remove("fade-out-rain"), 5500);
+
+                        printCharacter(index, text.substring(1, text.length))
+                    }, interval);
+                }
             }
+
+            // }
+            printCharacter(index, text)
         }
     };
 }
@@ -46,7 +59,7 @@ const createColumn = (left, matrix) => {
 const createCell = (left, top) => {
     console.log(`left ${left}, top ${top}`)
     const cell = document.createElement('span');
-    cell.textContent = 'A';
+    cell.textContent = '';
     cell.style.left = `${left}px`;
     cell.style.top = `${top}px`;
     return cell;
