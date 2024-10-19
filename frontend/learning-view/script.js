@@ -1,34 +1,5 @@
 let isTextAreaVisible = false;
 
-// Function to create falling characters
-function createMatrix() {
-  const matrix = document.getElementById("matrix");
-  const chars =
-    "あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをんカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン";
-  const numCols = Math.floor(window.innerWidth / 20);
-  const numRows = Math.floor(window.innerHeight / 20);
-
-  for (let i = 0; i < numCols; i++) {
-    for (let j = 0; j < numRows; j++) {
-      const span = document.createElement("span");
-      span.textContent = chars.charAt(Math.floor(Math.random() * chars.length));
-      span.style.left = `${i * 20}px`;
-      span.style.top = `${j * 20}px`;
-      matrix.appendChild(span);
-
-      const speed = Math.random() * 5 + 1;
-      const animate = () => {
-        let top = parseFloat(span.style.top);
-        if (top > window.innerHeight) {
-          top = -20;
-        }
-        span.style.top = `${top + speed}px`;
-        requestAnimationFrame(animate);
-      };
-      animate();
-    }
-  }
-}
 
 let words = JSON.parse(localStorage.getItem("words") || []).map((item) => ({
     label: item.label,
