@@ -29,6 +29,7 @@ dependencies {
 	implementation("org.liquibase:liquibase-core:4.29.2")
 	implementation("org.xerial:sqlite-jdbc:3.46.1.3")
 	implementation("org.hibernate.orm:hibernate-community-dialects:7.0.0.Beta1")
+	implementation("jakarta.validation:jakarta.validation-api:3.1.0")
 	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }

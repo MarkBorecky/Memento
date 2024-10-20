@@ -1,6 +1,6 @@
 package com.memento.config
 
-import com.memento.course.exceptions.CourseNotFoundException
+import com.memento.course.CourseNotFoundException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ExceptionHandler

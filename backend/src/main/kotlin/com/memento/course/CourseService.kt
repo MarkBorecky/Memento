@@ -1,13 +1,31 @@
 package com.memento.course
 
-import com.memento.course.exceptions.CourseNotFoundException
 import org.springframework.stereotype.Service
 
 @Service
 class CourseService(private val courseRepository: CourseRepository) {
-    fun addCourse(course: Course): Course = courseRepository.save(course)
-    fun getAll(): List<Course> = courseRepository.findAll()
-    fun getById(courseId: Int): Course = courseRepository.findById(courseId)
-        .orElseThrow { CourseNotFoundException("Not found course with id ${courseId}") }
 
+    fun addCourse(courseDTO: CourseDTO): CourseDTO {
+        val course = mapToEntity(courseDTO)
+        val savedCourse = courseRepository.save(course)
+        return mapToDTO(savedCourse)
+    }
+
+    fun getAll(): List<CourseDTO> = courseRepository.findAll().map(::mapToDTO)
+    fun getById(courseId: Int): CourseDTO = courseRepository.findById(courseId)
+        .map(::mapToDTO)
+        .orElseThrow { CourseNotFoundException("Not found course with id $courseId") }
+
+    fun updateCourse(courseId: Int, dto: CourseDTO): CourseDTO {
+        if (!courseRepository.existsById(courseId)) {
+            throw CourseNotFoundException("Not found course with id $courseId")
+        }
+        val course = mapToEntity(dto, courseId)
+        val updatedCourse = courseRepository.save(course)
+        return mapToDTO(updatedCourse)
+    }
+
+    private fun mapToDTO(course: Course): CourseDTO = with(course) { CourseDTO(id, name, languageA, languageB) }
+
+    private fun mapToEntity(dto: CourseDTO, courseId: Int = 0): Course = with(dto) { Course(courseId, name, languageA, languageB) }
 }

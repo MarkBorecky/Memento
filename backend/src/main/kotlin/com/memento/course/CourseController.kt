@@ -6,12 +6,16 @@ import org.springframework.web.bind.annotation.*
 class CourseController(private val courseService: CourseService) {
 
     @PostMapping("/courses")
-    fun addCourse(@RequestBody course: Course): Course = courseService.addCourse(course)
+    fun addCourse(@RequestBody course: CourseDTO): CourseDTO = courseService.addCourse(course)
 
     @GetMapping("/courses")
-    fun getCourses(): List<Course> = courseService.getAll()
+    fun getCourses(): List<CourseDTO> = courseService.getAll()
 
     @GetMapping("/courses/{courseId}")
-    fun getCourseById(@PathVariable courseId: Int): Course = courseService.getById(courseId)
+    fun getCourseById(@PathVariable courseId: Int): CourseDTO = courseService.getById(courseId)
+
+    @PutMapping("/courses/{courseId}")
+    fun updateCourseById(@PathVariable courseId: Int, @RequestBody course: CourseDTO): CourseDTO =
+        courseService.updateCourse(courseId, course);
 
 }

@@ -7,8 +7,8 @@ import jakarta.persistence.Id
 
 @Entity
 class Course(
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)val id: Int,
-    val name: String,
-    val languageA: String,
-    val languageB: String
-) {}
+    @Id @GeneratedValue (strategy = GenerationType.IDENTITY) val id: Int,
+    var name: String,
+    var languageA: String,
+    var languageB: String
+)
