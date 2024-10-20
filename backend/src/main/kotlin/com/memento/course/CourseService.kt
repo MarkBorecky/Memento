@@ -25,6 +25,8 @@ class CourseService(private val courseRepository: CourseRepository) {
         return mapToDTO(updatedCourse)
     }
 
+    fun deleteCourse(courseId: Int) = courseRepository.deleteById(courseId)
+
     private fun mapToDTO(course: Course): CourseDTO = with(course) { CourseDTO(id, name, languageA, languageB) }
 
     private fun mapToEntity(dto: CourseDTO, courseId: Int = 0): Course = with(dto) { Course(courseId, name, languageA, languageB) }
