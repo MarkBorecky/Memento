@@ -1,7 +1,7 @@
 --liquibase formatted sql
 --changeset mborecki:1
 
-CREATE TABLE flash_card (
+CREATE TABLE flash_cards (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     course_id INTEGER,
     value_a TEXT NOT NULL,
