@@ -4,7 +4,7 @@ import com.memento.course.Course
 import jakarta.persistence.*
 
 @Entity
-@Table(name = "flash_card")
+@Table(name = "flash_cards")
 class FlashCard(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

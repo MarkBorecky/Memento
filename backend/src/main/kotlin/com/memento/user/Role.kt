@@ -1,5 +1,6 @@
 package com.memento.user
 
+import com.memento.security.UserInfo
 import jakarta.persistence.*
 import org.hibernate.annotations.NaturalId
 
@@ -12,8 +13,8 @@ class Role(
     @Enumerated(EnumType.STRING)
     @NaturalId
     val name: RoleName,
-    @ManyToMany(targetEntity = User::class, mappedBy = "roles", fetch = FetchType.LAZY)
-    open var users: Set<User>? = setOf()
+    @ManyToMany(targetEntity = UserInfo::class, mappedBy = "roles", fetch = FetchType.LAZY)
+    open var users: Set<UserInfo>? = setOf()
 )
 
 enum class RoleName {

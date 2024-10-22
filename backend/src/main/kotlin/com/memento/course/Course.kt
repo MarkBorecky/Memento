@@ -8,7 +8,7 @@ import jakarta.persistence.Id
 import jakarta.persistence.Table
 
 @Entity
-@Table(name = "course")
+@Table(name = "courses")
 class Course(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) val id: Int,
     var name: String,
