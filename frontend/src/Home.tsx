@@ -1,8 +1,17 @@
 import React from 'react';
+import { NavBar } from './layout/NavBar';
 
-const Home: React.FC = () => {
-    console.log('Home component rendered');
-    return <h1>Welcome to the Home Page</h1>;
+interface HomeProps {
+    isAuthenticated: boolean
+}
+
+export const Home = (props: HomeProps) => {
+    return (
+        <div>
+            <NavBar isAuthenticated={props.isAuthenticated}/>
+            <h1>Witaj na stronie głównej!</h1>
+
+        </div>
+    );
 };
 
-export default Home;
