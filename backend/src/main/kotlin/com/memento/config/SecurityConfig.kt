@@ -59,6 +59,7 @@ class SecurityConfig(
         .cors { cors -> cors.disable() }
         .csrf { csrf -> csrf.disable() }
         .authorizeHttpRequests { requests -> requests
+            .requestMatchers(HttpMethod.GET, "/v3/api-docs").permitAll()
             .requestMatchers(HttpMethod.GET, "/courses/**").permitAll()
             .requestMatchers( "/auth/**").permitAll()
             .anyRequest().authenticated()
@@ -69,7 +70,7 @@ class SecurityConfig(
     @Bean
     fun corsConfigurationSource(): CorsConfigurationSource {
         val configuration = CorsConfiguration()
-        configuration.allowedOrigins = listOf("http://localhost:3000")
+        configuration.allowedOrigins = listOf(*allowedOrigins)
         configuration.allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "OPTIONS")
         configuration.allowedHeaders = listOf("*")
         configuration.allowCredentials = true
