@@ -14,7 +14,7 @@ import {
   PASSWORD_MIN_LENGTH,
   USERNAME_MAX_LENGTH,
   USERNAME_MIN_LENGTH,
-} from "../constants";
+} from "../config";
 import { Button, Form, Input, notification } from "antd";
 import { FormInstance } from "antd/lib/form";
 

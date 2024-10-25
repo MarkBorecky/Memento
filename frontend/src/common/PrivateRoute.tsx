@@ -7,8 +7,6 @@ const App: React.FC = () => {
     const isAuthenticated = true; // Replace with your actual authentication logic
 
     const handleLogin = () => {
-        console.log('User logged in');
-        // Here you can set the authentication state, e.g., update context or state
     };
 
     return (

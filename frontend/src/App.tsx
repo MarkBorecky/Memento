@@ -1,12 +1,14 @@
 import React, {useState} from "react";
 import { Route, Routes } from "react-router-dom";
 import { Home } from "./Home";
-import { Courses } from "./Courses";
+import { Courses } from "./pages/courses/Courses";
+import { CourseDetails } from "./pages/courses/CourseDetails";
 import Login from "./login/Login";
 import Signup from "./signup/Signup";
 import NotFound from "./common/NotFound";
 
-const App: React.FC = () => {
+
+export const App = () => {
 
     const [currentUser, setCurrentUser] = useState(null);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -29,9 +31,11 @@ const App: React.FC = () => {
     return (
     <Routes>
       <Route path="/home" element={<Home isAuthenticated={isAuthenticated} />} />
+      <Route path="/" element={<Home isAuthenticated={isAuthenticated} />} />
       <Route path="/login" element={login}/>
       <Route path="/signup" element={<Signup />} />
-      <Route path="/courses" element={<Courses />} />
+      <Route path="/courses" element={<Courses isAuthenticated={isAuthenticated}/>} />
+        <Route path="/courses/:id" element={<CourseDetails isAuthenticated={isAuthenticated}/>} />
       {/*<Route path="/stats" element={goIfAuthenticated(<Stats />)} />*/}
       {/*<Route path="/logout" element={<Logout onLogout={handleLogout}/>} /> */}
       <Route path="*" element={<NotFound />} />

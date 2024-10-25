@@ -2,7 +2,7 @@ import React from 'react';
 import { login } from '../util/APIUtils';
 import './Login.css';
 import { Link, useNavigate } from 'react-router-dom';
-import { ACCESS_TOKEN } from '../constants';
+import { ACCESS_TOKEN } from '../config';
 
 import { Form, Input, Button, notification } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
