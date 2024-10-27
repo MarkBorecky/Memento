@@ -34,7 +34,7 @@ class SecurityConfig(
 
     @Bean
     fun userInfoService(): UserInfoService {
-        return UserInfoService(userInfoRepository, roleRepository, passwordEncoder()) // Ensure UserInfoService implements UserDetailsService
+        return UserInfoService(userInfoRepository, roleRepository, passwordEncoder())
     }
 
     @Bean
