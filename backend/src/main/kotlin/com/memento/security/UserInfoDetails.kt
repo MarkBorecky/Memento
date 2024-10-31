@@ -1,4 +1,4 @@
-package com.memento.user
+package com.memento.security
 
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails

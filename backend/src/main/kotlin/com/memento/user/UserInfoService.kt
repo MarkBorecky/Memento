@@ -1,9 +1,6 @@
 package com.memento.user
 
-import com.memento.security.RoleRepository
-import com.memento.security.SignUpRequest
-import com.memento.security.UserInfo
-import com.memento.security.UserInfoRepository
+import com.memento.security.*
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
@@ -32,19 +29,11 @@ class UserInfoService(
             .orElseThrow { UsernameNotFoundException("User not found with user name $userName") }
 
 
-    fun getAllUsers(): List<UserDTO> = userInfoRepository.findAll().map(::mapToDto)
+    fun getAllUsers(): List<UserDTO> = userInfoRepository.findAll().map { UserDTO(it) }
 
     fun getUserById(id: Int): UserDTO = userInfoRepository.findById(id)
-        .map(::mapToDto)
+        .map { UserDTO(it) }
         .orElseThrow { UserNotFoundException("Not found user with id $id") }
-
-    private fun mapToDto(user: UserInfo): UserDTO = with(user) {
-        UserDTO(
-            id = id,
-            userName = userName,
-            email = email
-        )
-    }
 
     fun addUser(request: SignUpRequest): UserDTO {
         val roles = roleRepository.findByName(RoleName.ROLE_USER)
@@ -60,7 +49,7 @@ class UserInfoService(
 
         val savedUser = userInfoRepository.save(user)
 
-        return mapToDto(savedUser)
+        return UserDTO(savedUser)
     }
 
 }

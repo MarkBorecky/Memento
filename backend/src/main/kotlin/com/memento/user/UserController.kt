@@ -8,11 +8,9 @@ import org.springframework.web.bind.annotation.RestController
 class UserController(val userService: UserInfoService) {
 
     @GetMapping("/users")
-    fun getUsers(): List<UserDTO> = userService.getAllUsers();
+    fun getUsers(): List<UserDTO> = userService.getAllUsers()
 
     @GetMapping("/users/{id}")
     fun getUserById(@PathVariable id: Int): UserDTO = userService.getUserById(id)
-
-
 
 }
