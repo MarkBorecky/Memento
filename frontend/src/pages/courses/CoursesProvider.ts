@@ -1,4 +1,4 @@
-import { API_BASE_URL } from "../../config";
+import { COURSES_PATH } from "../../config";
 import {
   BehaviorSubject,
   catchError,
@@ -9,9 +9,11 @@ import {
   tap,
 } from "rxjs";
 
-export interface Course {
+export interface CourseInfo {
   id: number;
   name: string;
+  languageA: string;
+  languageB: string;
 }
 
 export const manageState =
@@ -33,8 +35,6 @@ export const manageState =
       setData(data.data);
     }
   };
-
-const RESOURCES_PATH = "/courses";
 
 export enum FetchingStatus {
   LOADING = "LOADING",
@@ -63,26 +63,26 @@ async function success<T>(response: T) {
   return { status: FetchingStatus.SUCCESS, data: response };
 }
 
-const createError = (error: any): Error<Course[]> => ({
+const createError = (error: any): Error<CourseInfo[]> => ({
   status: FetchingStatus.ERROR,
   errorMessage: error.message,
 });
 
 export class CoursesProvider {
-  private readonly data: BehaviorSubject<Result<Course[]>>;
+  private readonly data: BehaviorSubject<Result<CourseInfo[]>>;
 
   constructor() {
-    const loading: Result<Course[]> = { status: FetchingStatus.LOADING };
+    const loading: Result<CourseInfo[]> = { status: FetchingStatus.LOADING };
     this.data = new BehaviorSubject(loading);
     this.fetchData();
   }
 
-  public getData(): Observable<Result<Course[]>> {
+  public getData(): Observable<Result<CourseInfo[]>> {
     return this.data.asObservable();
   }
 
   private fetchData() {
-    from(fetch(`${API_BASE_URL}${RESOURCES_PATH}`))
+    from(fetch(`${COURSES_PATH}`))
       .pipe(
         tap((response: Response) => {
           if (!response.ok) {
