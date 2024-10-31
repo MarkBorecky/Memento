@@ -1,4 +1,4 @@
-import { API_BASE_URL, ACCESS_TOKEN } from '../config';
+import {ACCESS_TOKEN, API_BASE_URL} from '../config';
 
 type HttpMethod = 'GET' | 'POST'
 

@@ -12,11 +12,11 @@ class CourseController(private val courseService: CourseService) {
     fun getCourses(): List<CourseDTO> = courseService.getAll()
 
     @GetMapping("/courses/{courseId}")
-    fun getCourseById(@PathVariable courseId: Int): CourseDTO = courseService.getById(courseId)
+    fun getCourseById(@PathVariable courseId: Int): CourseDetailsDTO = courseService.getById(courseId)
 
     @PutMapping("/courses/{courseId}")
     fun updateCourseById(@PathVariable courseId: Int, @RequestBody course: CourseDTO): CourseDTO =
-        courseService.updateCourse(courseId, course);
+        courseService.updateCourse(courseId, course)
 
     @DeleteMapping("/courses/{courseId}")
     fun deleteCourse(@PathVariable courseId: Int) = courseService.deleteCourse(courseId)

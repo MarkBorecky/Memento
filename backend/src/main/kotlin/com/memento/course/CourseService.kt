@@ -12,8 +12,9 @@ class CourseService(private val courseRepository: CourseRepository) {
     }
 
     fun getAll(): List<CourseDTO> = courseRepository.findAll().map(::mapToDTO)
-    fun getById(courseId: Int): CourseDTO = courseRepository.findById(courseId)
-        .map(::mapToDTO)
+
+    fun getById(courseId: Int): CourseDetailsDTO = courseRepository.findById(courseId)
+        .map { CourseDetailsDTO(it) }
         .orElseThrow { CourseNotFoundException("Not found course with id $courseId") }
 
     fun updateCourse(courseId: Int, dto: CourseDTO): CourseDTO {

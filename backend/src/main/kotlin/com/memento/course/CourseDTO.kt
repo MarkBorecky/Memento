@@ -5,4 +5,6 @@ data class CourseDTO(
     val name: String,
     val languageA: String,
     val languageB: String
-)
+) {
+    constructor(course: Course) : this(course.id, course.name, course.languageA, course.languageB)
+}

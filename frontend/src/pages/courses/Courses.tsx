@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Course, CoursesProvider, manageState } from "./CoursesProvider";
+import { CourseInfo, CoursesProvider, manageState } from "./CoursesProvider";
 import { NavBar } from "../../layout/NavBar";
 import {Link} from "react-router-dom";
 
@@ -10,7 +10,7 @@ interface CoursesProps {
 }
 
 export const Courses = (props: CoursesProps) => {
-  const [courses, setCourses] = useState<Course[]>([]);
+  const [courses, setCourses] = useState<CourseInfo[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 

@@ -3,7 +3,7 @@ package com.memento.flashcards
 import org.springframework.web.bind.annotation.*
 
 @RestController
-class FlashCartController(val flashCardService: FlashCardService) {
+class FlashCardController(val flashCardService: FlashCardService) {
 
     @GetMapping("/courses/{courseId}/flash-cards")
     fun getAllFlashcardsByCourse(

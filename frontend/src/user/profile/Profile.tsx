@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { getUserProfile } from "../../util/APIUtils";
 import { Avatar, Tabs } from "antd";
 import { getAvatarColor } from "../../util/Colors";
 import { formatDate } from "../../util/Helper";
@@ -31,7 +30,7 @@ const Profile: React.FC<ProfileProps> = () => {
   const loadUserProfile = async (username: string) => {
     setIsLoading(true);
     try {
-      const response = await getUserProfile(username);
+      const response = null//await getUserProfile(username);
       setUser(response);
       setNotFound(false);
       setServerError(false);
