@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository
 import java.util.*
 
 interface FlashCardRepository: JpaRepository<FlashCard, Long> {
-    fun findAllByCourse(course: Course): List<FlashCard>
+    fun findAllByCourseOrderById(course: Course): List<FlashCard>
     fun deleteByCourseIdAndId(courseId: Int, flashCardId: Int): Void
     fun findByCourseAndId(course: Course, flashCardId: Int): Optional<FlashCard>
 

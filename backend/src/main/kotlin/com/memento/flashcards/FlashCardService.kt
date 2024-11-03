@@ -10,11 +10,10 @@ import org.springframework.stereotype.Service
 class FlashCardService(
     val flashCardRepository: FlashCardRepository,
     val courseRepository: CourseRepository,
-    private val courseService: CourseService,
 ) {
     fun getAllFlashCardsByCourse(courseId: Int): List<FlashCardDTO> {
         val flashCards = courseRepository.findById(courseId)
-            .map(flashCardRepository::findAllByCourse)
+            .map(flashCardRepository::findAllByCourseOrderById)
             .orElseThrow { CourseNotFoundException("Not found course with id $courseId") }
 
         return flashCards.map { flashCard -> mapToDTO(flashCard) }

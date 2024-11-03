@@ -37,12 +37,12 @@ const LoginForm: React.FC<LoginProps> = ({ onLogin }) => {
         } catch (error: any) {
             if (error.status === 401) {
                 notification.error({
-                    message: 'Polling XxxApp',
+                    message: 'Memento App',
                     description: 'Your Username or Password is incorrect. Please try again!',
                 });
             } else {
                 notification.error({
-                    message: 'Polling XxxApp',
+                    message: 'Memento App',
                     description: error.message || 'Sorry! Something went wrong. Please try again!',
                 });
             }

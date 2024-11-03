@@ -8,8 +8,11 @@ import jakarta.persistence.*
 class Course(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) val id: Int,
     var name: String,
-    @Column(name = "language_a") var languageA: String,
-    @Column(name = "language_b") var languageB: String,
+    @Column(name = "language_a")
+    var languageA: String,
+    @Column(name = "language_b")
+    var languageB: String,
     @OneToMany(mappedBy = "course", fetch = FetchType.EAGER, cascade = [CascadeType.PERSIST, CascadeType.MERGE])
+    @OrderBy("id")
     val flashCards: Set<FlashCard> = mutableSetOf()
 )

@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import { Route, Routes } from "react-router-dom";
 import { Home } from "./Home";
 import { Courses } from "./pages/courses/Courses";
@@ -6,36 +6,66 @@ import { CourseDetails } from "./pages/courses/CourseDetails";
 import Login from "./login/Login";
 import Signup from "./signup/Signup";
 import NotFound from "./common/NotFound";
+import { User } from "./user/profile/Profile";
+import { LearningView } from "./pages/learning/LearningView";
+import { ACCESS_TOKEN, SESSION_PATH } from "./config";
 
+async function getSession(): Promise<User> {
+  const token = localStorage.getItem(ACCESS_TOKEN);
+  const options = {
+    headers: new Headers({
+      Authorization: `Bearer ${token}`,
+    }),
+    method: "GET",
+  };
+  const response = await fetch(SESSION_PATH, options);
+  return await response.json();
+}
 
 export const App = () => {
+  const [user, setUser] = useState<User | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-    const [currentUser, setCurrentUser] = useState(null);
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const [isLoading, setIsLoading] = useState(true);
+  const handleLogin = () => {
+    setIsAuthenticated(true);
+    console.log("getSession");
+    getSession().then((user) => setUser(user));
+  };
 
-    const handleLogin = () => {
-        setIsAuthenticated(true);
-    };
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+  };
 
-    const handleLogout = () => {
-        setIsAuthenticated(false);
-    };
+  const login = <Login onLogin={handleLogin} />;
 
-    const login = <Login onLogin={handleLogin} />;
+  function goIfAuthenticated(target: React.JSX.Element) {
+    return isAuthenticated ? target : login;
+  }
 
-    function goIfAuthenticated(target: React.JSX.Element) {
-      return isAuthenticated ? target : login;
-    }
-
-    return (
+  return (
     <Routes>
-      <Route path="/home" element={<Home isAuthenticated={isAuthenticated} />} />
+      <Route
+        path="/home"
+        element={<Home isAuthenticated={isAuthenticated} />}
+      />
       <Route path="/" element={<Home isAuthenticated={isAuthenticated} />} />
-      <Route path="/login" element={login}/>
+      <Route path="/login" element={login} />
       <Route path="/signup" element={<Signup />} />
-      <Route path="/courses" element={<Courses isAuthenticated={isAuthenticated}/>} />
-        <Route path="/courses/:id" element={<CourseDetails isAuthenticated={isAuthenticated}/>} />
+      <Route
+        path="/courses"
+        element={<Courses isAuthenticated={isAuthenticated} />}
+      />
+      <Route
+        path="/courses/:courseId"
+        element={<CourseDetails user={user} />}
+      />
+      <Route
+        path="/courses/:courseId/learning"
+        element={
+          <LearningView isAuthenticated={isAuthenticated} userId={user?.id} />
+        }
+      />
       {/*<Route path="/stats" element={goIfAuthenticated(<Stats />)} />*/}
       {/*<Route path="/logout" element={<Logout onLogout={handleLogout}/>} /> */}
       <Route path="*" element={<NotFound />} />

@@ -1,7 +1,20 @@
 package com.memento.user
 
-import com.memento.security.*
+//import com.memento.security.*
+import com.memento.security.UserInfoRepository
+import com.memento.security.RoleRepository
+import com.memento.security.UserInfoDetails
+import com.memento.security.SignUpRequest
+import com.memento.security.UserInfo
+import com.memento.security.RoleName
+import com.memento.session.SessionInfoDTO
+import io.jsonwebtoken.Claims
+import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2ResourceServerProperties
+import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2ResourceServerProperties.*
+import org.springframework.security.core.Authentication
 import org.springframework.security.core.authority.SimpleGrantedAuthority
+import org.springframework.security.core.context.SecurityContext
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.core.userdetails.UsernameNotFoundException
@@ -51,5 +64,27 @@ class UserInfoService(
 
         return UserDTO(savedUser)
     }
+
+    fun getCurrentSessionInfo(): SessionInfoDTO {
+        val securityContext = SecurityContextHolder.getContext()
+        val userName = extractPrincipal(securityContext.authentication)
+        return userInfoRepository.findByUserName(userName)
+            .map { SessionInfoDTO(it.id, it.userName, it.email) }
+            .orElseThrow { UsernameNotFoundException("User not found with user name $userName") }
+    }
+
+    private fun extractPrincipal(authentication: Authentication?): String {
+        if (authentication == null) {
+            throw UserNotFoundException("No user is logged")
+        }
+
+        return when (val principal = authentication.principal) {
+            is String -> principal
+            is UserDetails -> principal.username
+            is Claims -> principal.subject
+            else -> throw UserNotFoundException("No user is logged")
+        }
+    }
+
 
 }

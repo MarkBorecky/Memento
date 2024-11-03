@@ -59,9 +59,10 @@ class SecurityConfig(
         .cors { cors -> cors.disable() }
         .csrf { csrf -> csrf.disable() }
         .authorizeHttpRequests { requests -> requests
+            .requestMatchers(HttpMethod.OPTIONS).permitAll()
             .requestMatchers(HttpMethod.GET, "/v3/api-docs").permitAll()
             .requestMatchers(HttpMethod.GET, "/courses/**").permitAll()
-            .requestMatchers( "/auth/**").permitAll()
+            .requestMatchers(HttpMethod.POST, "/auth/**").permitAll()
             .anyRequest().authenticated()
         }
         .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter::class.java)

@@ -10,9 +10,9 @@ import { useParams } from "react-router-dom";
 
 const { TabPane } = Tabs;
 
-interface User {
+export interface User {
+  id: number,
   name: string;
-  username: string;
 }
 
 interface ProfileProps {
