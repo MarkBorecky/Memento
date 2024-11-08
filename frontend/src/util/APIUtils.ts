@@ -1,11 +1,11 @@
-import {ACCESS_TOKEN, API_BASE_URL} from '../config';
+import { ACCESS_TOKEN, API_BASE_URL } from "../config";
 
-type HttpMethod = 'GET' | 'POST'
+type HttpMethod = "GET" | "POST";
 
 interface Options {
-    url: string,
-    method: HttpMethod,
-    body?: string
+  url: string;
+  method: HttpMethod;
+  body?: string;
 }
 
 const request = (options: Options) => {
@@ -30,23 +30,31 @@ const request = (options: Options) => {
   );
 };
 
-
 interface LoginRequest {
-    login: string,
-    password: string
+  login: string;
+  password: string;
 }
 
 export function login(loginRequest: LoginRequest) {
-  return request({
-    url: API_BASE_URL + "/auth/signin",
+  const options = {
+    headers: new Headers({
+      "Content-Type": "application/json",
+    }),
     method: "POST",
     body: JSON.stringify(loginRequest),
+  };
+
+  return fetch(API_BASE_URL + "/auth/signin", options).then((response) => {
+    return response.json().then((json) => {
+      if (!response.ok) {
+        return Promise.reject(json);
+      }
+      return json;
+    });
   });
 }
 
-interface SignupRequest {
-
-}
+interface SignupRequest {}
 
 export function signup(signupRequest: SignupRequest) {
   return request({
@@ -57,34 +65,15 @@ export function signup(signupRequest: SignupRequest) {
 }
 
 export function checkUsernameAvailability(username: string) {
-    return request({
-        url: API_BASE_URL + "/user/checkUsernameAvailability?username=" + username,
-        method: 'GET'
-    });
+  return request({
+    url: API_BASE_URL + "/user/checkUsernameAvailability?username=" + username,
+    method: "GET",
+  });
 }
 
 export function checkEmailAvailability(email: string) {
-    return request({
-        url: API_BASE_URL + "/user/checkEmailAvailability?email=" + email,
-        method: 'GET'
-    });
-}
-
-
-export function getCurrentUser() {
-    if(!localStorage.getItem(ACCESS_TOKEN)) {
-        return Promise.reject("No access token set.");
-    }
-
-    return request({
-        url: API_BASE_URL + "/user/me",
-        method: 'GET'
-    });
-}
-
-export function getUserProfile(username: string) {
-    return request({
-        url: API_BASE_URL + "/users/" + username,
-        method: 'GET'
-    });
+  return request({
+    url: API_BASE_URL + "/user/checkEmailAvailability?email=" + email,
+    method: "GET",
+  });
 }
