@@ -2,18 +2,18 @@ import { Link } from "react-router-dom";
 import React from "react";
 
 interface NavBarProps {
-  isAuthenticated: boolean
+  isAuthenticated: boolean;
 }
 
 export const NavBar = (props: NavBarProps) => {
   return (
     <nav>
       <ul>
-        <li>
-          <Link to="/courses">Kursy</Link>
-        </li>
         {props.isAuthenticated && (
           <>
+            <li>
+              <Link to="/dashboard">Dashboard</Link>
+            </li>
             <li>
               <Link to="/stats">Moje Statystyki</Link>
             </li>
@@ -22,10 +22,13 @@ export const NavBar = (props: NavBarProps) => {
             </li>
           </>
         )}
+        <li>
+          <Link to="/courses">Kursy</Link>
+        </li>
         {!props.isAuthenticated && (
-            <li>
-              <Link to="/login">Zaloguj</Link>
-            </li>
+          <li>
+            <Link to="/login">Zaloguj</Link>
+          </li>
         )}
       </ul>
     </nav>

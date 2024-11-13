@@ -14,8 +14,7 @@ class LearningFlashCard(
     @JoinColumn(name = "flash_card_id", insertable = false, updatable = false)
     val flashCard: FlashCard,
 
-    @Enumerated(EnumType.STRING)
-    val stage: LearningStage,
+    val correctAnswerCount: Int,
 
     val lastCorrectAnswer: Instant,
     val nextAskingTime: Instant

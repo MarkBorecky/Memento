@@ -10,10 +10,10 @@ interface LearningFlashCardRepository: JpaRepository<LearningFlashCard, Learning
         select lfc from LearningFlashCard lfc
         where lfc.id.userId = :userId and
             lfc.id.courseId = :courseId and
-            lfc.stage <> 'LEARNT'
-            
+            lfc.correctAnswerCount < :learntAnswerCountBorder
+
     """)
-    fun findByUserIdAndCourseId(userId: Int, courseId: Int, pageable: Pageable): List<LearningFlashCard>
+    fun findByUserIdAndCourseId(userId: Int, courseId: Int, pageable: Pageable, learntAnswerCountBorder: Int): List<LearningFlashCard>
 
     @Query("""
         select fc from FlashCard fc

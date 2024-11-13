@@ -8,6 +8,7 @@ import Signup from "./signup/Signup";
 import NotFound from "./common/NotFound";
 import { User } from "./user/profile/Profile";
 import { LearningView } from "./pages/learning/LearningView";
+import { DashboardView } from "./pages/dashboard/DashboardView";
 import { ACCESS_TOKEN, SESSION_PATH } from "./config";
 
 async function getSession(): Promise<User> {
@@ -29,7 +30,6 @@ export const App = () => {
 
   const handleLogin = () => {
     setIsAuthenticated(true);
-    console.log("getSession");
     getSession().then((user) => setUser(user));
   };
 
@@ -40,6 +40,16 @@ export const App = () => {
   const login = <Login onLogin={handleLogin} />;
 
   function goIfAuthenticated(target: React.JSX.Element) {
+    if (!isAuthenticated) {
+      const token = localStorage.getItem(ACCESS_TOKEN);
+      if (token) {
+        getSession().then((user) => {
+          setUser(user);
+          setIsAuthenticated(true);
+        });
+      }
+    }
+
     return isAuthenticated ? target : login;
   }
 
@@ -62,9 +72,15 @@ export const App = () => {
       />
       <Route
         path="/courses/:courseId/learning"
-        element={
-          <LearningView isAuthenticated={isAuthenticated} userId={user?.id} />
-        }
+        element={goIfAuthenticated(
+          <LearningView isAuthenticated={isAuthenticated} userId={user?.id} />,
+        )}
+      />
+      <Route
+        path="/dashboard"
+        element={goIfAuthenticated(
+          <DashboardView isAuthenticated={isAuthenticated} userId={user?.id} />,
+        )}
       />
       {/*<Route path="/stats" element={goIfAuthenticated(<Stats />)} />*/}
       {/*<Route path="/logout" element={<Logout onLogout={handleLogout}/>} /> */}
