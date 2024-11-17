@@ -1,207 +1,279 @@
-import { useNavigate, useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { ACCESS_TOKEN, API_BASE_URL } from "../../config";
+import {useNavigate, useParams} from "react-router-dom";
+import {useEffect, useState} from "react";
+import {ACCESS_TOKEN, API_BASE_URL} from "../../config";
 
 interface LearningViewProps {
-  isAuthenticated: boolean;
-  userId: number | undefined;
+    isAuthenticated: boolean;
+    userId: number | undefined;
 }
 
 interface FlashCard {
-  valueA: string;
-  valueB: string;
-  correctAnswerCount: number;
+    valueA: string;
+    valueB: string;
+    correctAnswerCount: number;
 }
 
-enum State {
-  INITIALIZATION,
-  CORRECT_ANSWER,
-  INCORRECT_ANSWER,
-  WAITING_FOR_ANSWER,
-  END_LEARNING_SESSION,
-}
-
-interface SessionState {
-  input: string;
-  currentFlashCard: FlashCard;
-  passedFlashCards: FlashCard[];
-  flashCardsToAsk: FlashCard[];
-  state: State;
-}
-
-const emptyFlashCard = {
-  valueA: "",
-  valueB: "",
-  correctAnswerCount: 0,
+type StateMember<TType extends string> = {
+    type: TType;
 };
 
-const INITIAL_STATE: SessionState = {
-  input: "",
-  currentFlashCard: emptyFlashCard,
-  passedFlashCards: [],
-  flashCardsToAsk: [],
-  state: State.INITIALIZATION,
+type LearningSessionState =
+    | {
+    type: "INITIALIZATION";
+    progress: "0%";
+}
+    | {
+    type: "CORRECT_ANSWER";
+    passedFlashCards: FlashCard[];
+    flashCardsToAsk: FlashCard[];
+    correctAnswer: string;
+    progress: string;
+}
+    | {
+    type: "INCORRECT_ANSWER";
+    passedFlashCards: FlashCard[];
+    flashCardsToAsk: FlashCard[];
+    usersAnswer: string;
+    correctAnswer: string;
+    progress: string;
+}
+    | {
+    type: "WAITING_FOR_ANSWER";
+    input: string;
+    currentFlashCard: FlashCard;
+    passedFlashCards: FlashCard[];
+    flashCardsToAsk: FlashCard[];
+    progress: string;
+}
+    | {
+    type: "END_LEARNING_SESSION";
+    passedFlashCards: FlashCard[];
+    progress: "100%";
 };
 
 export const LearningView = (props: LearningViewProps) => {
-  const { courseId } = useParams<{ courseId: string }>();
-  const [session, setSession] = useState<SessionState>(INITIAL_STATE);
+    const {courseId} = useParams<{ courseId: string }>();
+    const [session, setSession] = useState<LearningSessionState>({
+        type: "INITIALIZATION",
+        progress: "0%",
+    });
 
-  const navigate = useNavigate();
-
-  const options = {
-    headers: new Headers({
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${localStorage.getItem(ACCESS_TOKEN)}`,
-    }),
-    method: "GET",
-  };
-
-  useEffect(() => {
-    fetch(`${API_BASE_URL}/users/${props.userId}/courses/${courseId}`, options)
-      .then((res) => res.json())
-      .then((data: FlashCard[]) => {
-        const flashCard = data.shift();
-        if (!flashCard) {
-          throw Error("flashCard is undefined!");
+    useEffect(() => {
+        console.log("use effect")
+        if (session.type === "CORRECT_ANSWER" || session.type === "INCORRECT_ANSWER") {
+            setTimeout(() => refreshState(), 1000);
         }
-        setSession({
-          input: "",
-          currentFlashCard: flashCard,
-          passedFlashCards: [],
-          flashCardsToAsk: data,
-          state: State.WAITING_FOR_ANSWER,
-        });
-      });
-  }, []);
+    }, [session]);
 
-  const createCorrectAnswerSessionState = (
-    session: SessionState,
-  ): SessionState => ({
-    state: State.CORRECT_ANSWER,
-    passedFlashCards: [...session.passedFlashCards, session.currentFlashCard],
-    currentFlashCard: emptyFlashCard,
-    flashCardsToAsk: session.flashCardsToAsk,
-    input: session.input,
-  });
+    const navigate = useNavigate();
 
-  const createIncorrectAnswerSessionState = (
-    session: SessionState,
-  ): SessionState => ({
-    state: State.INCORRECT_ANSWER,
-    passedFlashCards: session.passedFlashCards,
-    currentFlashCard: emptyFlashCard,
-    flashCardsToAsk: [...session.flashCardsToAsk, session.currentFlashCard],
-    input: session.input,
-  });
-
-  const createWaitingForAnswerOrEndSessionState = (
-    session: SessionState,
-  ): SessionState => {
-    const nextFlashCard = session.flashCardsToAsk[0];
-    if (!nextFlashCard) {
-      return {
-        state: State.END_LEARNING_SESSION,
-        currentFlashCard: emptyFlashCard,
-        flashCardsToAsk: [],
-        passedFlashCards: session.passedFlashCards,
-        input: "",
-      };
-    }
-
-    return {
-      state: State.WAITING_FOR_ANSWER,
-      currentFlashCard: nextFlashCard,
-      flashCardsToAsk: session.flashCardsToAsk.slice(
-        1,
-        session.flashCardsToAsk.length,
-      ),
-      passedFlashCards: session.passedFlashCards,
-      input: "",
+    const options = {
+        headers: new Headers({
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem(ACCESS_TOKEN)}`,
+        }),
+        method: "GET",
     };
-  };
 
-  function acceptAnswer(session: SessionState) {
-    if (session.state !== State.WAITING_FOR_ANSWER) {
-      throw Error(
-        "Incorrect state. Cannot accept answer if state is not WAITING_FOR_ANSWER",
-      );
+    useEffect(() => {
+        fetch(`${API_BASE_URL}/users/${props.userId}/courses/${courseId}`, options)
+            .then((res) => res.json())
+            .then((data: FlashCard[]) => {
+                const flashCard = data.shift();
+                if (!flashCard) {
+                    throw Error("flashCard is undefined!");
+                }
+                setSession({
+                    input: "",
+                    currentFlashCard: flashCard,
+                    passedFlashCards: [],
+                    flashCardsToAsk: data,
+                    type: "WAITING_FOR_ANSWER",
+                    progress: session.progress,
+                });
+            });
+    }, []);
+
+    function assertState<TType extends string>(
+        state: { type: string },
+        expectedType: TType,
+    ): asserts state is StateMember<TType> {
+        if (expectedType !== state.type) {
+            throw new Error("skjdhfkjsd");
+        }
     }
-    const isAnswerCorrect = session.input === session.currentFlashCard.valueA;
 
-    const newSessionState = isAnswerCorrect
-      ? createCorrectAnswerSessionState(session)
-      : createIncorrectAnswerSessionState(session);
+    function assertStateOr<TType extends string>(
+        state: { type: string },
+        expectedTypeA: TType,
+        expectedTypeB: TType,
+    ): asserts state is StateMember<TType> {
+        if (expectedTypeA !== state.type && expectedTypeB !== state.type) {
+            throw new Error("skjdhfkjsd");
+        }
+    }
 
-    setSession(newSessionState);
+    function refreshState() {
+        console.log('refress', session.type)
+        setWaitingForAnswerOrEndSessionState()
+    }
 
-    setTimeout(
-      () =>
-        setSession((session) =>
-          createWaitingForAnswerOrEndSessionState(session),
-        ),
-      1000,
-    );
-  }
+    const setWaitingForAnswerOrEndSessionState = () => {
+        assertStateOr(session, "CORRECT_ANSWER", "INCORRECT_ANSWER");
 
-  function getSessionStatistics() {
-    const { passedFlashCards, flashCardsToAsk, currentFlashCard } = session;
-    const passedQuestionAmount = passedFlashCards.length;
-    const allQuestionsAmount =
-      flashCardsToAsk.length +
-      passedFlashCards.length +
-      (currentFlashCard.valueA !== "" ? 1 : 0);
+        const areThereCardToLearn = session.flashCardsToAsk.length !== 0;
 
-    return `${passedQuestionAmount}/${allQuestionsAmount}`;
-  }
+        const endLearningSession: LearningSessionState = {
+            type: "END_LEARNING_SESSION",
+            passedFlashCards: session.passedFlashCards,
+            progress: "100%",
+        };
 
-  const learningPanel = session.currentFlashCard &&
-    session.state !== State.END_LEARNING_SESSION && (
-      <div>
-        <h5>cards: {getSessionStatistics()}</h5>
-        <label>{session.currentFlashCard.valueB}</label>
-        {session.state === State.INCORRECT_ANSWER && (
-          <>
-            <s style={{ color: "red" }}>{session.input}</s>
-            <p style={{ color: "green" }}>{session.currentFlashCard.valueA}</p>
-          </>
-        )}
-        {session.state === State.CORRECT_ANSWER && (
-          <p style={{ color: "green" }}>{session.input}</p>
-        )}
-        <input
-          value={session.input}
-          onChange={(event) =>
+        const correctAnswers = session.passedFlashCards.length;
+        const allFlashCards = correctAnswers + session.flashCardsToAsk.length;
+        const progress = `${correctAnswers * 100 / allFlashCards}%`;
+
+        const waitingForAnswer: LearningSessionState = {
+            type: "WAITING_FOR_ANSWER",
+            currentFlashCard: session.flashCardsToAsk[0],
+            flashCardsToAsk: session.flashCardsToAsk.slice(
+                1,
+                session.flashCardsToAsk.length,
+            ),
+            passedFlashCards: session.passedFlashCards,
+            input: "",
+            progress: progress,
+        };
+
+        setSession(areThereCardToLearn ? waitingForAnswer : endLearningSession);
+    };
+
+    function acceptAnswer(session: LearningSessionState) {
+        assertState(session, "WAITING_FOR_ANSWER");
+        const isAnswerCorrect = session.input === session.currentFlashCard.valueA;
+
+        function setCorrenctAnserState() {
+            assertState(session, "WAITING_FOR_ANSWER");
+
+            const correctAnswers = session.passedFlashCards.length + 1;
+            const allFlashCards = correctAnswers + session.flashCardsToAsk.length;
+            const progress = `${(correctAnswers * 100) / allFlashCards}%`;
+
             setSession({
-              ...session,
-              input: event.target.value,
-            })
-          }
-          // onKeyUp={() => acceptAnswer(currentFlashCard, input)}
-        />
-        <button onClick={() => acceptAnswer(session)}>Answer</button>
-      </div>
+                type: "CORRECT_ANSWER",
+                correctAnswer: session.input,
+                passedFlashCards: [
+                    ...session.passedFlashCards,
+                    session.currentFlashCard,
+                ],
+                flashCardsToAsk: session.flashCardsToAsk,
+                progress: progress,
+            });
+        }
+
+        function setIncorrectAnserState() {
+            assertState(session, "WAITING_FOR_ANSWER");
+
+            const correctAnswers = session.passedFlashCards.length;
+            const allFlashCards = correctAnswers + session.flashCardsToAsk.length + 1;
+            const progress = `${(correctAnswers * 100) / allFlashCards}%`;
+
+            setSession({
+                type: "INCORRECT_ANSWER",
+                usersAnswer: session.input,
+                correctAnswer: session.currentFlashCard.valueA,
+                passedFlashCards: session.passedFlashCards,
+                flashCardsToAsk: [...session.flashCardsToAsk, session.currentFlashCard],
+                progress: progress,
+            });
+        }
+
+        if (isAnswerCorrect) {
+            setCorrenctAnserState();
+        } else {
+            setIncorrectAnserState();
+        }
+        // TODO: encapsulate deducing if answer is correct inside function to set state and use one type for both cases
+    }
+
+    const isSessionActive =
+        session.type !== "INITIALIZATION" &&
+        session.type !== "END_LEARNING_SESSION";
+
+    const progressPanel = isSessionActive && (
+        <h5>progress: {session.progress}</h5>
     );
 
-  const summaryPanel = session.state === State.END_LEARNING_SESSION && (
-      <div>
-          {session.passedFlashCards.map(card => (
-              <>
-                  {JSON.stringify(card)}
-                  <button onClick={() => navigate('/dashboard')}> go to dashboard</button>
-              </>
-          ))}
-      </div>
-  )
+    const questionPanel = session.type === "WAITING_FOR_ANSWER" && (
+        <h5>{session.currentFlashCard.valueB}</h5>
+    );
 
-  return (
-    <div>
-      <h1>
-        Learning... {State[session.state]},{" "}
-        {JSON.stringify(session.currentFlashCard)}
-      </h1>
-      {learningPanel}
-      {summaryPanel}
-    </div>
-  );
+    const correctAnswerFeedback = session.type === "CORRECT_ANSWER" && (
+        <p style={{color: "green"}}>{session.correctAnswer}</p>
+    );
+
+    const wrongAnswerFeedback = session.type === "INCORRECT_ANSWER" && (
+        <>
+            <s style={{color: "red"}}>{session.usersAnswer}</s>
+            <p style={{color: "green"}}>{session.correctAnswer}</p>
+        </>
+    );
+
+    const learningPanel = session.type === "WAITING_FOR_ANSWER" && (
+        <div>
+            <input
+                value={session.input}
+                onChange={(event) => {
+                    assertState(session, "WAITING_FOR_ANSWER");
+                    setSession({
+                        ...session,
+                        input: event.target.value,
+                    });
+                }}
+                // onKeyUp={() => acceptAnswer(currentFlashCard, input)}
+            />
+            <button onClick={() => acceptAnswer(session)}>Answer</button>
+        </div>
+    );
+
+    const summaryPanel = session.type === "END_LEARNING_SESSION" && (
+        <div>
+            {
+                <>
+                    <h5>cards:</h5>
+                    {
+                        session.passedFlashCards.map((card) => (
+                            <>
+                                {JSON.stringify(card)}
+                            </>
+                        ))
+                    }
+                    <button onClick={() => {
+                        // send progress to backend
+                        navigate("/dashboard")
+                    }}>
+                        go to dashboard
+                    </button>
+                    <button onClick={() => {
+                        // send progress to backend
+                        navigate(`/courses/${courseId}/learning`)
+                    }}>
+                        continue leraning
+                    </button>
+                </>
+
+            }
+        </div>
+    );
+
+    return (
+        <div>
+            {progressPanel}
+            {questionPanel}
+            {correctAnswerFeedback}
+            {wrongAnswerFeedback}
+            {learningPanel}
+            {summaryPanel}
+        </div>
+    );
 };
