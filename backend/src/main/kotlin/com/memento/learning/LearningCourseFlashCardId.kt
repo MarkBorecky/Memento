@@ -11,4 +11,8 @@ class LearningCourseFlashCardId(
     val courseId: Int,
     @Column(name = "flash_card_id")
     val flashCardId: Int
-)
+) {
+    override fun toString(): String {
+        return "$userId-$courseId-$flashCardId)"
+    }
+}

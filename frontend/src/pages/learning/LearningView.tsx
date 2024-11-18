@@ -1,16 +1,26 @@
-import {useNavigate, useParams} from "react-router-dom";
-import {useEffect, useState} from "react";
-import {ACCESS_TOKEN, API_BASE_URL} from "../../config";
+import { useNavigate, useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { ACCESS_TOKEN, API_BASE_URL } from "../../config";
 
 interface LearningViewProps {
-    isAuthenticated: boolean;
-    userId: number | undefined;
+  isAuthenticated: boolean;
+  userId: number | undefined;
 }
 
+type FlashCardId = `${number}-${number}-${number}`;
+
 interface FlashCard {
+    id: FlashCardId;
     valueA: string;
     valueB: string;
     correctAnswerCount: number;
+}
+
+interface Question {
+    question: string;
+    correctAnswer: string;
+    flashCardId: FlashCardId;
+
 }
 
 type StateMember<TType extends string> = {
@@ -24,15 +34,15 @@ type LearningSessionState =
 }
     | {
     type: "CORRECT_ANSWER";
-    passedFlashCards: FlashCard[];
-    flashCardsToAsk: FlashCard[];
+    passedQuestions: Question[];
+    questionsToAsk: Question[];
     correctAnswer: string;
     progress: string;
 }
     | {
     type: "INCORRECT_ANSWER";
-    passedFlashCards: FlashCard[];
-    flashCardsToAsk: FlashCard[];
+    passedQuestions: Question[];
+    questionsToAsk: Question[];
     usersAnswer: string;
     correctAnswer: string;
     progress: string;
@@ -40,14 +50,14 @@ type LearningSessionState =
     | {
     type: "WAITING_FOR_ANSWER";
     input: string;
-    currentFlashCard: FlashCard;
-    passedFlashCards: FlashCard[];
-    flashCardsToAsk: FlashCard[];
+    currentQuestion: Question;
+    passedQuestions: Question[];
+    questionsToAsk: Question[];
     progress: string;
 }
     | {
     type: "END_LEARNING_SESSION";
-    passedFlashCards: FlashCard[];
+    passedQuestions: Question[];
     progress: "100%";
 };
 
@@ -58,10 +68,35 @@ export const LearningView = (props: LearningViewProps) => {
         progress: "0%",
     });
 
+    const THRESHOLD = 6;
+
+    function prepareQuestions(flashCards: FlashCard[]): Question[] {
+        const questionMatrix: Question[][] = flashCards.map((card: FlashCard) => prepareAllQuestionsForCardUntilEndOfThreshold(card))
+
+        const transposedMatrixOfFlashCards = transposeMatrix(questionMatrix);
+
+        return transposedMatrixOfFlashCards.flatMap((row: Question[]) => row)
+    }
+    
+    function transposeMatrix(matrix: Question[][]) {
+        return matrix[0].map((_, columnIndex) => matrix
+            .map((row: Question[]) => row[columnIndex]))
+    }
+
+    function prepareAllQuestionsForCardUntilEndOfThreshold(flashCard: FlashCard): Question[] {
+        if (flashCard.correctAnswerCount >= THRESHOLD) {
+            return [];
+        }
+        return Array.from({length: THRESHOLD - flashCard.correctAnswerCount}, () => ({
+            question: flashCard.valueB,
+            correctAnswer: flashCard.valueA,
+            flashCardId: flashCard.id
+        }));
+    }
+
     useEffect(() => {
-        console.log("use effect")
         if (session.type === "CORRECT_ANSWER" || session.type === "INCORRECT_ANSWER") {
-            setTimeout(() => refreshState(), 1000);
+            setTimeout(() => setWaitingForAnswerOrEndSessionState(), 1000);
         }
     }, [session]);
 
@@ -78,17 +113,19 @@ export const LearningView = (props: LearningViewProps) => {
     useEffect(() => {
         fetch(`${API_BASE_URL}/users/${props.userId}/courses/${courseId}`, options)
             .then((res) => res.json())
-            .then((data: FlashCard[]) => {
-                const flashCard = data.shift();
-                if (!flashCard) {
+            .then((flashCards: FlashCard[]) => {
+                const questions: Question[] = prepareQuestions(flashCards);
+
+                const question = questions.shift();
+                if (!question) {
                     throw Error("flashCard is undefined!");
                 }
                 setSession({
-                    input: "",
-                    currentFlashCard: flashCard,
-                    passedFlashCards: [],
-                    flashCardsToAsk: data,
                     type: "WAITING_FOR_ANSWER",
+                    input: "",
+                    currentQuestion: question,
+                    passedQuestions: [],
+                    questionsToAsk: questions,
                     progress: session.progress,
                 });
             });
@@ -113,60 +150,55 @@ export const LearningView = (props: LearningViewProps) => {
         }
     }
 
-    function refreshState() {
-        console.log('refress', session.type)
-        setWaitingForAnswerOrEndSessionState()
-    }
-
     const setWaitingForAnswerOrEndSessionState = () => {
-        assertStateOr(session, "CORRECT_ANSWER", "INCORRECT_ANSWER");
+      assertStateOr(session, "CORRECT_ANSWER", "INCORRECT_ANSWER");
 
-        const areThereCardToLearn = session.flashCardsToAsk.length !== 0;
+      const areThereCardToLearn = session.questionsToAsk.length !== 0;
 
-        const endLearningSession: LearningSessionState = {
-            type: "END_LEARNING_SESSION",
-            passedFlashCards: session.passedFlashCards,
-            progress: "100%",
-        };
+      const endLearningSession: LearningSessionState = {
+        type: "END_LEARNING_SESSION",
+        passedQuestions: session.passedQuestions,
+        progress: "100%",
+      };
 
-        const correctAnswers = session.passedFlashCards.length;
-        const allFlashCards = correctAnswers + session.flashCardsToAsk.length;
-        const progress = `${correctAnswers * 100 / allFlashCards}%`;
+      const correctAnswers = session.passedQuestions.length;
+      const allFlashCards = correctAnswers + session.questionsToAsk.length;
+      const progress = `${(correctAnswers * 100) / allFlashCards}%`;
 
-        const waitingForAnswer: LearningSessionState = {
-            type: "WAITING_FOR_ANSWER",
-            currentFlashCard: session.flashCardsToAsk[0],
-            flashCardsToAsk: session.flashCardsToAsk.slice(
-                1,
-                session.flashCardsToAsk.length,
-            ),
-            passedFlashCards: session.passedFlashCards,
-            input: "",
-            progress: progress,
-        };
+      const waitingForAnswer: LearningSessionState = {
+        type: "WAITING_FOR_ANSWER",
+        currentQuestion: session.questionsToAsk[0],
+        questionsToAsk: session.questionsToAsk.slice(
+          1,
+          session.questionsToAsk.length,
+        ),
+        passedQuestions: session.passedQuestions,
+        input: "",
+        progress: progress,
+      };
 
-        setSession(areThereCardToLearn ? waitingForAnswer : endLearningSession);
+      setSession(areThereCardToLearn ? waitingForAnswer : endLearningSession);
     };
 
     function acceptAnswer(session: LearningSessionState) {
         assertState(session, "WAITING_FOR_ANSWER");
-        const isAnswerCorrect = session.input === session.currentFlashCard.valueA;
+        const isAnswerCorrect = session.input === session.currentQuestion.question;
 
         function setCorrenctAnserState() {
             assertState(session, "WAITING_FOR_ANSWER");
 
-            const correctAnswers = session.passedFlashCards.length + 1;
-            const allFlashCards = correctAnswers + session.flashCardsToAsk.length;
+            const correctAnswers = session.passedQuestions.length + 1;
+            const allFlashCards = correctAnswers + session.questionsToAsk.length;
             const progress = `${(correctAnswers * 100) / allFlashCards}%`;
 
             setSession({
                 type: "CORRECT_ANSWER",
                 correctAnswer: session.input,
-                passedFlashCards: [
-                    ...session.passedFlashCards,
-                    session.currentFlashCard,
+                passedQuestions: [
+                    ...session.passedQuestions,
+                    session.currentQuestion,
                 ],
-                flashCardsToAsk: session.flashCardsToAsk,
+                questionsToAsk: session.questionsToAsk,
                 progress: progress,
             });
         }
@@ -174,16 +206,16 @@ export const LearningView = (props: LearningViewProps) => {
         function setIncorrectAnserState() {
             assertState(session, "WAITING_FOR_ANSWER");
 
-            const correctAnswers = session.passedFlashCards.length;
-            const allFlashCards = correctAnswers + session.flashCardsToAsk.length + 1;
+            const correctAnswers = session.passedQuestions.length;
+            const allFlashCards = correctAnswers + session.questionsToAsk.length + 1;
             const progress = `${(correctAnswers * 100) / allFlashCards}%`;
 
             setSession({
                 type: "INCORRECT_ANSWER",
                 usersAnswer: session.input,
-                correctAnswer: session.currentFlashCard.valueA,
-                passedFlashCards: session.passedFlashCards,
-                flashCardsToAsk: [...session.flashCardsToAsk, session.currentFlashCard],
+                correctAnswer: session.currentQuestion.correctAnswer,
+                passedQuestions: session.passedQuestions,
+                questionsToAsk: [...session.questionsToAsk, session.currentQuestion],
                 progress: progress,
             });
         }
@@ -205,7 +237,7 @@ export const LearningView = (props: LearningViewProps) => {
     );
 
     const questionPanel = session.type === "WAITING_FOR_ANSWER" && (
-        <h5>{session.currentFlashCard.valueB}</h5>
+        <h5>{session.currentQuestion.question}</h5>
     );
 
     const correctAnswerFeedback = session.type === "CORRECT_ANSWER" && (
@@ -230,7 +262,7 @@ export const LearningView = (props: LearningViewProps) => {
                         input: event.target.value,
                     });
                 }}
-                // onKeyUp={() => acceptAnswer(currentFlashCard, input)}
+                // onKeyUp={() => acceptAnswer(currentQuestion, input)}
             />
             <button onClick={() => acceptAnswer(session)}>Answer</button>
         </div>
@@ -242,7 +274,7 @@ export const LearningView = (props: LearningViewProps) => {
                 <>
                     <h5>cards:</h5>
                     {
-                        session.passedFlashCards.map((card) => (
+                        session.passedQuestions.map((card) => (
                             <>
                                 {JSON.stringify(card)}
                             </>

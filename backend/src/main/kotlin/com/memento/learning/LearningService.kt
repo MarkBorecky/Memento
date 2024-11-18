@@ -36,7 +36,11 @@ class LearningService(
         val flashCards = learningFlashCardRepository.findByUserIdAndCourseId(userId, courseId, Pageable.ofSize(5), learntAnswerCountBorder)
 
         val oldDeck = flashCards
-            .map { LearningFlashCardDTO(it.flashCard.valueA, it.flashCard.valueB, it.correctAnswerCount) }
+            .map {
+                with(it) {
+                    LearningFlashCardDTO(id.toString(), flashCard.valueA, flashCard.valueB, correctAnswerCount)
+                }
+            }
 
         //2 fetch rest of items from flash_cards by id
         val deckSize = oldDeck.size
@@ -47,7 +51,11 @@ class LearningService(
         val fetchFlashCardIds = flashCards.map { it.id.flashCardId }
         val pageable = Pageable.ofSize(size - deckSize)
         val newDeck = learningFlashCardRepository.findByCourseIdAndIgnoreFetchedIds(courseId, fetchFlashCardIds, pageable)
-            .map { LearningFlashCardDTO(it.valueA, it.valueB, 0) }
+            .map {
+                with(it) {
+                    LearningFlashCardDTO( id.toString(), valueA, valueB, 0)
+                }
+            }
         return oldDeck + newDeck
     }
 }
