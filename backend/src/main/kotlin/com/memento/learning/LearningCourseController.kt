@@ -21,4 +21,13 @@ class LearningController(private val learningService: LearningService) {
         @PathVariable courseId: Int,
         @RequestParam(defaultValue = "5") size: Int
     ): List<LearningFlashCardDTO> = learningService.getLearningFlashCardSet(userId, courseId, size)
+
+    @PostMapping("/users/{userId}/courses/{courseId}")
+    fun saveLearningProgress(
+        @PathVariable userId: Int,
+        @PathVariable courseId: Int,
+        @RequestBody progress: ProgressRequestDTO
+    ) {
+        learningService.saveLearningProgress(userId, courseId, progress)
+    }
 }

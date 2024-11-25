@@ -2,20 +2,24 @@ package com.memento.learning
 
 import com.memento.course.CourseDTO
 import com.memento.course.CourseRepository
+import com.memento.flashcards.FlashCard
+import com.memento.flashcards.FlashCardRepository
 import com.memento.security.UserInfoRepository
 import com.memento.user.UserDTO
 import com.memento.user.UserNotFoundException
-import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
+import java.time.Instant
 
 @Service
 class LearningService(
     private val courseRepository: CourseRepository,
     private val userRepository: UserInfoRepository,
-    private val learningFlashCardRepository: LearningFlashCardRepository
+    private val learningFlashCardRepository: LearningFlashCardRepository,
+    private val flashCardRepository: FlashCardRepository
 ) {
     fun addCourseToUsersLearningCourses(userId: Int, courseId: Int): UserDTO {
-        val userReference = userRepository.findById(userId).orElseThrow { UserNotFoundException("User not found with id $userId") }
+        val userReference =
+            userRepository.findById(userId).orElseThrow { UserNotFoundException("User not found with id $userId") }
 
         userReference.addLearningCourse(courseRepository.getReferenceById(courseId))
 
@@ -32,30 +36,45 @@ class LearningService(
 
     fun getLearningFlashCardSet(userId: Int, courseId: Int, size: Int): List<LearningFlashCardDTO> {
         val learntAnswerCountBorder = 7
-        //1 fetch items from learning_flash_cards
-        val flashCards = learningFlashCardRepository.findByUserIdAndCourseId(userId, courseId, Pageable.ofSize(5), learntAnswerCountBorder)
 
-        val oldDeck = flashCards
-            .map {
-                with(it) {
-                    LearningFlashCardDTO(id.toString(), flashCard.valueA, flashCard.valueB, correctAnswerCount)
-                }
+        val projection = learningFlashCardRepository
+            .findFlashCardsToLearnByUserAndCourse(userId, courseId, learntAnswerCountBorder)
+
+        return projection.map {
+
+            with(it) {
+                LearningFlashCardDTO(
+                    createLearningFlashCardId(flashCardId, courseId, userId),
+                    valueA,
+                    valueB,
+                    correctAnswerCount)
             }
+        }
+    }
 
-        //2 fetch rest of items from flash_cards by id
-        val deckSize = oldDeck.size
-        if (deckSize >= size) {
-            return oldDeck
+    private fun createLearningFlashCardId(flashCardId: Int, courseId: Int, userId: Int): String =
+        "$userId-$courseId-$flashCardId"
+
+    fun saveLearningProgress(userId: Int, courseId: Int, progress: ProgressRequestDTO) {
+        val learningFlashCardsIds = progress.flashCardsProgress.map { it.mapToLearningCourseFlashCardId() }
+        val storedLearningFlashCardsMap = learningFlashCardRepository.findAllById(learningFlashCardsIds).map { it.id.toString() to it.correctAnswerCount }.toMap()
+
+        val cardsToManyPersist = progress.flashCardsProgress.map {
+            val id = it.mapToLearningCourseFlashCardId()
+
+            val flashCardId: FlashCard = flashCardRepository.getReferenceById(id.flashCardId)
+
+            LearningFlashCard(
+                id = id,
+                flashCard = flashCardId,
+                correctAnswerCount = storedLearningFlashCardsMap.getOrDefault(id.toString(), 0) + it.correctAnswersCount,
+                lastCorrectAnswer = Instant.now(),
+                nextAskingTime = Instant.now()
+            )
         }
 
-        val fetchFlashCardIds = flashCards.map { it.id.flashCardId }
-        val pageable = Pageable.ofSize(size - deckSize)
-        val newDeck = learningFlashCardRepository.findByCourseIdAndIgnoreFetchedIds(courseId, fetchFlashCardIds, pageable)
-            .map {
-                with(it) {
-                    LearningFlashCardDTO( id.toString(), valueA, valueB, 0)
-                }
-            }
-        return oldDeck + newDeck
+        val savedItems = learningFlashCardRepository.saveAll(cardsToManyPersist)
+        println(savedItems)
     }
+
 }
