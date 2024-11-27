@@ -11,7 +11,8 @@ class CustomLearningFlashCardRepositoryImpl(
     override fun findFlashCardsToLearnByUserAndCourse(
         userId: Int,
         courseId: Int,
-        learntAnswerCountBorder: Int
+        learntAnswerCountBorder: Int,
+        size: Int
     ): List<FlashCardProjection> {
         return entityManager.createQuery(
             """
@@ -37,6 +38,7 @@ class CustomLearningFlashCardRepositoryImpl(
             .setParameter("learntAnswerCountBorder", learntAnswerCountBorder)
             .setParameter("userId", userId)
             .setParameter("courseId", courseId)
+            .setMaxResults(size)
             .resultList
     }
 

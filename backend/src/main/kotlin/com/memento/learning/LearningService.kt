@@ -38,7 +38,7 @@ class LearningService(
         val learntAnswerCountBorder = 7
 
         val projection = learningFlashCardRepository
-            .findFlashCardsToLearnByUserAndCourse(userId, courseId, learntAnswerCountBorder)
+            .findFlashCardsToLearnByUserAndCourse(userId, courseId, learntAnswerCountBorder, size)
 
         return projection.map {
 
