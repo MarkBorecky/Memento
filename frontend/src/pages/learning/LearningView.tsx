@@ -342,7 +342,8 @@ export const LearningView = (props: LearningViewProps) => {
           });
         }}
         onKeyDown={(event) => {
-          if (event.key === "return") {
+          console.log(event)
+          if (event.key === "Enter") {
             acceptAnswer(session);
           }
         }}
