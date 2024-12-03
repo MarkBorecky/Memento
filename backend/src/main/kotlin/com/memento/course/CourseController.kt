@@ -12,7 +12,7 @@ class CourseController(private val courseService: CourseService) {
     fun getCourses(): List<CourseDTO> = courseService.getAll()
 
     @GetMapping("/courses/{courseId}")
-    fun getCourseById(@PathVariable courseId: Int): CourseDetailsDTO = courseService.getById(courseId)
+    fun getCourseById(@PathVariable courseId: Int): CourseFullDTO = courseService.getById(courseId)
 
     @PutMapping("/courses/{courseId}")
     fun updateCourseById(@PathVariable courseId: Int, @RequestBody course: CourseDTO): CourseDTO =

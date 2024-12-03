@@ -1,0 +1,37 @@
+.LearningPanel {
+    display: flex;
+    flex-direction: column; /* Uk?ada elementy w kolumnie */
+    align-items: center; /* Wy?rodkowuje wszystkie elementy horyzontalnie */
+    text-align: center; /* Centruje tekst wewn?trz */
+    position: relative; /* Dla dok?adnego zarz?dzania pozycj? */
+    min-height: 100vh;
+}
+
+.Banner {
+    width: 100%; /* Rozci?ga Banner na ca?? szeroko?? */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+}
+
+.centerText {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+}
+
+.right {
+  margin-left: auto;
+}
+
+.input {
+  margin-top: 20px; /* Przestrze? pomi?dzy Bannerem a inputem */
+    text-align: center;
+    width: 100%;
+    display: flex;
+    justify-content: center; /* Wy?rodkowanie inputu horyzontalnie */
+}
+
+

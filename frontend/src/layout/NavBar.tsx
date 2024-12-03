@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import React from "react";
+import "./NavBar.css";
 
 interface NavBarProps {
   isAuthenticated: boolean;
@@ -7,30 +8,22 @@ interface NavBarProps {
 
 export const NavBar = (props: NavBarProps) => {
   return (
-    <nav>
-      <ul>
-        {props.isAuthenticated && (
-          <>
-            <li>
-              <Link to="/dashboard">Dashboard</Link>
-            </li>
-            <li>
-              <Link to="/stats">Moje Statystyki</Link>
-            </li>
-            <li>
-              <Link to="/logout">Wyloguj</Link>
-            </li>
-          </>
-        )}
-        <li>
-          <Link to="/courses">Kursy</Link>
-        </li>
-        {!props.isAuthenticated && (
-          <li>
-            <Link to="/login">Zaloguj</Link>
-          </li>
-        )}
-      </ul>
-    </nav>
+      <header className="NavBar" >
+          <nav>
+              <ul>
+                  {props.isAuthenticated && (
+                      <>
+                          <li><Link to="/dashboard">Dashboard</Link></li>
+                          <li><Link to="/stats">Moje Statystyki</Link></li>
+                          <li><Link to="/logout">Wyloguj</Link></li>
+                      </>
+                  )}
+                  <li><Link to="/courses">Kursy</Link></li>
+                  {!props.isAuthenticated && (
+                      <li><Link to="/login">Zaloguj</Link></li>
+                  )}
+              </ul>
+          </nav>
+      </header>
   );
 };

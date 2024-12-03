@@ -1,8 +1,10 @@
 package com.memento.course
 
-import com.memento.flashcards.FlashCardDTO
+import com.fasterxml.jackson.annotation.JsonUnwrapped
+import com.memento.learning.LearningDetails
 
-class CourseDetailsDTO(val details: CourseDTO, val flashCards: List<FlashCardDTO>) {
-    constructor(course: Course) : this(CourseDTO(course), course.flashCards.map { FlashCardDTO(it) })
-
+data class CourseDetailsDTO(
+    @JsonUnwrapped val progressInfo: LearningDetails,
+    @JsonUnwrapped val courseDetails: CourseDTO
+) {
 }

@@ -1,7 +1,9 @@
 import { useNavigate, useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ACCESS_TOKEN, API_BASE_URL } from "../../config";
 import { CloseSquareOutlined } from "@ant-design/icons";
+import "./LearningView.css";
+import { Flex, Progress } from "antd";
 
 interface LearningViewProps {
   isAuthenticated: boolean;
@@ -85,12 +87,12 @@ function createProgressRequest(passedQuestions: Question[]) {
 
   const progressArray = Object.entries(progressMap).map(([id, progress]) => ({
     id: id,
-    correctAnswersCount: progress
-  }))
+    correctAnswersCount: progress,
+  }));
 
   return {
-    flashCardsProgress: progressArray
-  }
+    flashCardsProgress: progressArray,
+  };
 }
 
 export const LearningView = (props: LearningViewProps) => {
@@ -184,7 +186,6 @@ export const LearningView = (props: LearningViewProps) => {
       throw new Error(`State should be ${expectedType}`);
     }
   }
-
 
   function assertStateIsNot<TType extends string>(
     state: { type: string },
@@ -311,10 +312,6 @@ export const LearningView = (props: LearningViewProps) => {
     session.type !== "INITIALIZATION" &&
     session.type !== "END_LEARNING_SESSION";
 
-  const progressPanel = isSessionActive && (
-    <h5>progress: {session.progress}</h5>
-  );
-
   const questionPanel = session.type === "WAITING_FOR_ANSWER" && (
     <p style={{ fontSize: "40px" }}>{session.currentQuestion.question}</p>
   );
@@ -344,14 +341,18 @@ export const LearningView = (props: LearningViewProps) => {
             input: event.target.value,
           });
         }}
-        // onKeyUp={() => acceptAnswer(currentQuestion, input)}
+        onKeyDown={(event) => {
+          if (event.key === "return") {
+            acceptAnswer(session);
+          }
+        }}
       />
-      <button
-        style={{ fontSize: "40px" }}
-        onClick={() => acceptAnswer(session)}
-      >
-        Answer
-      </button>
+      {/*<button*/}
+      {/*  style={{ fontSize: "40px" }}*/}
+      {/*  onClick={() => acceptAnswer(session)}*/}
+      {/*>*/}
+      {/*  Check Answer*/}
+      {/*</button>*/}
     </div>
   );
 
@@ -385,13 +386,25 @@ export const LearningView = (props: LearningViewProps) => {
   );
 
   return (
-    <div>
-      <CloseSquareOutlined onClick={() => goToDashBoard()} />
-      {progressPanel}
-      {questionPanel}
-      {correctAnswerFeedback}
-      {wrongAnswerFeedback}
-      {learningPanel}
+    <div className="LearningPanel">
+      <div className="right">
+        <CloseSquareOutlined onClick={() => goToDashBoard()} />
+      </div>
+      <div className="Banner">
+        <div className="centerText">
+          {questionPanel}
+          {correctAnswerFeedback}
+          {wrongAnswerFeedback}
+        </div>
+        <div className="right">
+          {isSessionActive && (
+            <Flex gap="small" wrap justify="flex-end">
+              <Progress type="circle" percent={75} />
+            </Flex>
+          )}
+        </div>
+      </div>
+      <div className="input">{learningPanel}</div>
       {summaryPanel}
     </div>
   );

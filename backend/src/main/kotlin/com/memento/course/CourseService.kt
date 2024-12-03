@@ -13,8 +13,8 @@ class CourseService(private val courseRepository: CourseRepository) {
 
     fun getAll(): List<CourseDTO> = courseRepository.findAll().map(::mapToDTO)
 
-    fun getById(courseId: Int): CourseDetailsDTO = courseRepository.findById(courseId)
-        .map { CourseDetailsDTO(it) }
+    fun getById(courseId: Int): CourseFullDTO = courseRepository.findById(courseId)
+        .map { CourseFullDTO(it) }
         .orElseThrow { CourseNotFoundException("Not found course with id $courseId") }
 
     fun updateCourse(courseId: Int, dto: CourseDTO): CourseDTO {
@@ -28,7 +28,7 @@ class CourseService(private val courseRepository: CourseRepository) {
 
     fun deleteCourse(courseId: Int) = courseRepository.deleteById(courseId)
 
-    private fun mapToDTO(course: Course): CourseDTO = with(course) { CourseDTO(id, name, languageA, languageB) }
+    private fun mapToDTO(course: Course): CourseDTO = with(course) { CourseDTO(id, name, languageA, languageB, flashCards.size) }
 
     private fun mapToEntity(dto: CourseDTO, courseId: Int = 0): Course = with(dto) { Course(courseId, name, languageA, languageB) }
 }

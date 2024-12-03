@@ -7,7 +7,6 @@ import { ACCESS_TOKEN } from '../config';
 import { Form, Input, Button, notification } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 
-// Typy dla propsów
 interface LoginProps {
     onLogin: () => void;
 }

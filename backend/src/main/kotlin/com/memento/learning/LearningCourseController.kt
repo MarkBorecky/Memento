@@ -1,6 +1,6 @@
 package com.memento.learning
 
-import com.memento.course.CourseDTO
+import com.memento.course.CourseDetailsDTO
 import com.memento.user.UserDTO
 import org.springframework.web.bind.annotation.*
 
@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*
 class LearningController(private val learningService: LearningService) {
 
     @GetMapping("/users/{userId}/courses")
-    fun getUserLearningCourses(@PathVariable userId: Int): List<CourseDTO> =
+    fun getUserLearningCourses(@PathVariable userId: Int): List<CourseDetailsDTO> =
         learningService.getUserLearningCourses(userId)
 
     @PatchMapping("/users/{userId}/courses/{courseId}")

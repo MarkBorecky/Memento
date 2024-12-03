@@ -1,6 +1,6 @@
 package com.memento.learning
 
-import com.memento.course.CourseDTO
+import com.memento.course.CourseDetailsDTO
 import com.memento.course.CourseRepository
 import com.memento.flashcards.FlashCard
 import com.memento.flashcards.FlashCardRepository
@@ -28,10 +28,8 @@ class LearningService(
         return UserDTO(savedUser)
     }
 
-    fun getUserLearningCourses(userId: Int): List<CourseDTO> {
-        val user = userRepository.findById(userId)
-            .orElseThrow { throw UserNotFoundException("User not found with id $userId") }
-        return user.getLearningCourses().map { CourseDTO(it.id, it.name, it.languageA, it.languageB) }
+    fun getUserLearningCourses(userId: Int): List<CourseDetailsDTO> {
+        return learningFlashCardRepository.getAllLearningCoursesWithDetailsByUserid(userId);
     }
 
     fun getLearningFlashCardSet(userId: Int, courseId: Int, size: Int): List<LearningFlashCardDTO> {

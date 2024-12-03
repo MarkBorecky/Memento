@@ -10,9 +10,11 @@ import { User } from "./user/profile/Profile";
 import { LearningView } from "./pages/learning/LearningView";
 import { DashboardView } from "./pages/dashboard/DashboardView";
 import { ACCESS_TOKEN, SESSION_PATH } from "./config";
+import {jwtDecode, JwtPayload} from "jwt-decode";
 
 async function getSession(): Promise<User> {
   const token = localStorage.getItem(ACCESS_TOKEN);
+
   const options = {
     headers: new Headers({
       Authorization: `Bearer ${token}`,
@@ -21,6 +23,21 @@ async function getSession(): Promise<User> {
   };
   const response = await fetch(SESSION_PATH, options);
   return await response.json();
+}
+
+function isTokenExpired(token: string | null) {
+  if (!token) {
+    return true;
+  }
+
+  try {
+    const decodedToken: JwtPayload = jwtDecode(token);
+    const currentTime = Date.now() / 1000;
+    return decodedToken.exp && decodedToken.exp < currentTime;
+  } catch (error) {
+    console.error(`Error decoding token: ${error}`);
+    return true;
+  }
 }
 
 export const App = () => {
@@ -40,14 +57,16 @@ export const App = () => {
   const login = <Login onLogin={handleLogin} />;
 
   function goIfAuthenticated(target: React.JSX.Element) {
+    const token = localStorage.getItem(ACCESS_TOKEN);
+    if (isTokenExpired(token)) {
+      return login;
+    }
+
     if (!isAuthenticated) {
-      const token = localStorage.getItem(ACCESS_TOKEN);
-      if (token) {
-        getSession().then((user) => {
-          setUser(user);
-          setIsAuthenticated(true);
-        });
-      }
+      getSession().then((user) => {
+        setUser(user);
+        setIsAuthenticated(true);
+      });
     }
 
     return isAuthenticated ? target : login;

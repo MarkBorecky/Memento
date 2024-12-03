@@ -28,13 +28,13 @@ class UserInfo(
         joinColumns = [JoinColumn(name = "user_id")],
         inverseJoinColumns = [JoinColumn(name = "course_id")]
     )
-    private val learningCourse: MutableSet<Course> = mutableSetOf()
+    private val learningCourses: MutableSet<Course> = mutableSetOf()
 ) {
     fun addLearningCourse(course: Course) {
-        this.learningCourse.add(course)
+        this.learningCourses.add(course)
     }
 
     fun getLearningCourses(): Set<Course> {
-        return learningCourse.toSet()
+        return learningCourses.toSet()
     }
 }

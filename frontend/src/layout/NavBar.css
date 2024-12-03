@@ -1,0 +1,28 @@
+header {
+    background-color: #282c34;
+    color: #c8c8c8;
+    font-family: "Source Code Pro", "SourceCodePro", monospace;
+    font-weight: 700;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    ;
+}
+
+/*nav {*/
+/*    align-items: flex-end;*/
+/*}*/
+
+header * {
+    display: inline;
+}
+
+header li {
+    margin: 25px;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
