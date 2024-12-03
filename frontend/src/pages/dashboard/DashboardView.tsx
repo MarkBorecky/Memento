@@ -13,6 +13,9 @@ export interface CourseInfo {
   name: string;
   languageA: string;
   languageB: string;
+  cardsAmount: number;
+  learntItems: number;
+  learningItems: number;
 }
 
 export const DashboardView = (props: DashboardViewProps) => {
