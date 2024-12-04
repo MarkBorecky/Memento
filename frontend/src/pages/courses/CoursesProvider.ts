@@ -8,13 +8,7 @@ import {
   switchMap,
   tap,
 } from "rxjs";
-
-export interface CourseInfo {
-  id: number;
-  name: string;
-  languageA: string;
-  languageB: string;
-}
+import {CourseInfo} from "./model/CourseInfo";
 
 export const manageState =
   <T>(

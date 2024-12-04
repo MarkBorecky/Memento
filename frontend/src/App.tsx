@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Route, Routes } from "react-router-dom";
 import { Home } from "./Home";
-import { Courses } from "./pages/courses/Courses";
 import { CourseDetails } from "./pages/courses/CourseDetails";
 import Login from "./login/Login";
 import Signup from "./signup/Signup";
@@ -11,6 +10,7 @@ import { LearningView } from "./pages/learning/LearningView";
 import { DashboardView } from "./pages/dashboard/DashboardView";
 import { ACCESS_TOKEN, SESSION_PATH } from "./config";
 import {jwtDecode, JwtPayload} from "jwt-decode";
+import {CoursesView} from "./pages/courses/CoursesView";
 
 async function getSession(): Promise<User> {
   const token = localStorage.getItem(ACCESS_TOKEN);
@@ -83,7 +83,7 @@ export const App = () => {
       <Route path="/signup" element={<Signup />} />
       <Route
         path="/courses"
-        element={<Courses isAuthenticated={isAuthenticated} />}
+        element={<CoursesView isAuthenticated={isAuthenticated} />}
       />
       <Route
         path="/courses/:courseId"

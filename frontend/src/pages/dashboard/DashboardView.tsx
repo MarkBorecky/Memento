@@ -1,21 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { ACCESS_TOKEN, API_BASE_URL } from "../../config";
 import { NavBar } from "../../layout/NavBar";
-import { CoursePanel } from "./CoursePanel";
+import { CourseInfo } from "../courses/model/CourseInfo";
+import { LearningCoursePanel } from "../courses/components/LearningCoursePanel";
 
 interface DashboardViewProps {
   isAuthenticated: boolean;
   userId: number | undefined;
-}
-
-export interface CourseInfo {
-  id: number;
-  name: string;
-  languageA: string;
-  languageB: string;
-  cardsAmount: number;
-  learntItems: number;
-  learningItems: number;
 }
 
 export const DashboardView = (props: DashboardViewProps) => {
@@ -40,10 +31,10 @@ export const DashboardView = (props: DashboardViewProps) => {
   return (
     <div>
       <NavBar isAuthenticated={props.isAuthenticated} />
-      <ul style={{listStyleType: "none"}}>
+      <ul style={{ listStyleType: "none" }}>
         {courses.map((course) => (
           <li key={course.id}>
-            <CoursePanel course={course} />
+            <LearningCoursePanel course={course} />
           </li>
         ))}
       </ul>

@@ -82,9 +82,8 @@ const Signup: React.FC = () => {
 
   const handleSubmit = async () => {
     const signupRequest = {
-      name: name.value,
       email: email.value,
-      username: username.value,
+      userName: username.value,
       password: password.value,
     };
     try {
@@ -237,20 +236,6 @@ const Signup: React.FC = () => {
       <h1 className="page-title">Sign Up</h1>
       <div className="signup-content">
         <Form form={form} onFinish={handleSubmit} className="signup-form">
-          <Form.Item
-            label="Full Name"
-            validateStatus={name.validateStatus}
-            help={name.errorMsg}
-          >
-            <Input
-              size="large"
-              name="name"
-              autoComplete="off"
-              placeholder="Your full name"
-              value={name.value}
-              onChange={(event) => handleInputChange(event, validateName)}
-            />
-          </Form.Item>
           <Form.Item
             label="Username"
             hasFeedback

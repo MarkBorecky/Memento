@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import {useNavigate, useParams} from "react-router-dom";
 import { ACCESS_TOKEN, API_BASE_URL, COURSES_PATH } from "../../config";
-import { CourseInfo } from "./CoursesProvider";
 import { User } from "../../user/profile/Profile";
+import {CourseInfo} from "./model/CourseInfo";
 
 interface CourseDetailsProps {
   user: User | null;

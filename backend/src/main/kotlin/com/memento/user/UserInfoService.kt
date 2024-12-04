@@ -1,19 +1,10 @@
 package com.memento.user
 
-//import com.memento.security.*
-import com.memento.security.UserInfoRepository
-import com.memento.security.RoleRepository
-import com.memento.security.UserInfoDetails
-import com.memento.security.SignUpRequest
-import com.memento.security.UserInfo
-import com.memento.security.RoleName
+import com.memento.security.*
 import com.memento.session.SessionInfoDTO
 import io.jsonwebtoken.Claims
-import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2ResourceServerProperties
-import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2ResourceServerProperties.*
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.authority.SimpleGrantedAuthority
-import org.springframework.security.core.context.SecurityContext
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
@@ -27,18 +18,20 @@ class UserInfoService(
     private val userInfoRepository: UserInfoRepository,
     val roleRepository: RoleRepository,
     val passwordEncoder: PasswordEncoder
-): UserDetailsService {
+) : UserDetailsService {
 
     @Transactional(readOnly = true)
     override fun loadUserByUsername(userName: String): UserDetails =
         userInfoRepository.findByUserName(userName)
-            .map{ userInfo -> with (userInfo) {
-                UserInfoDetails(
-                    userName,
-                    password,
-                    roles.map { role -> SimpleGrantedAuthority(role.name.name) }.toMutableList()
-                )
-            }}
+            .map { userInfo ->
+                with(userInfo) {
+                    UserInfoDetails(
+                        userName,
+                        password,
+                        roles.map { role -> SimpleGrantedAuthority(role.name.name) }.toMutableList()
+                    )
+                }
+            }
             .orElseThrow { UsernameNotFoundException("User not found with user name $userName") }
 
 
@@ -48,9 +41,10 @@ class UserInfoService(
         .map { UserDTO(it) }
         .orElseThrow { UserNotFoundException("Not found user with id $id") }
 
+    @Transactional
     fun addUser(request: SignUpRequest): UserDTO {
         val roles = roleRepository.findByName(RoleName.ROLE_USER)
-        val user = with (request) {
+        val user = with(request) {
             UserInfo(
                 id = 0,
                 password = passwordEncoder.encode(password),

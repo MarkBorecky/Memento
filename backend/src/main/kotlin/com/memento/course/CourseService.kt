@@ -1,34 +1,43 @@
 package com.memento.course
 
+import com.memento.security.UserInfo
+import com.memento.security.UserInfoRepository
+import com.memento.user.UserNotFoundException
 import org.springframework.stereotype.Service
 
 @Service
-class CourseService(private val courseRepository: CourseRepository) {
+class CourseService(
+    private val courseRepository: CourseRepository,
+    private val userInfoRepository: UserInfoRepository
+) {
 
     fun addCourse(courseDTO: CourseDTO): CourseDTO {
-        val course = mapToEntity(courseDTO)
+        val author = userInfoRepository.findByUserName(courseDTO.authorName)
+            .orElseThrow{ throw UserNotFoundException("User with name ${courseDTO.authorName} not found") }
+        val course = mapToEntity(courseDTO, author)
         val savedCourse = courseRepository.save(course)
-        return mapToDTO(savedCourse)
+        return CourseDTO(savedCourse)
     }
 
-    fun getAll(): List<CourseDTO> = courseRepository.findAll().map(::mapToDTO)
+    fun getAll(): List<CourseDTO> = courseRepository.findAll().map{ CourseDTO(it) }
 
     fun getById(courseId: Int): CourseFullDTO = courseRepository.findById(courseId)
         .map { CourseFullDTO(it) }
         .orElseThrow { CourseNotFoundException("Not found course with id $courseId") }
 
-    fun updateCourse(courseId: Int, dto: CourseDTO): CourseDTO {
+    fun updateCourse(courseId: Int, courseDTO: CourseDTO): CourseDTO {
         if (!courseRepository.existsById(courseId)) {
             throw CourseNotFoundException("Not found course with id $courseId")
         }
-        val course = mapToEntity(dto, courseId)
+        val author = userInfoRepository.findByUserName(courseDTO.authorName)
+            .orElseThrow{ throw UserNotFoundException("User with name ${courseDTO.authorName} not found") }
+        val course = mapToEntity(courseDTO, author, courseId)
         val updatedCourse = courseRepository.save(course)
-        return mapToDTO(updatedCourse)
+        return CourseDTO(updatedCourse)
     }
 
     fun deleteCourse(courseId: Int) = courseRepository.deleteById(courseId)
 
-    private fun mapToDTO(course: Course): CourseDTO = with(course) { CourseDTO(id, name, languageA, languageB, flashCards.size) }
-
-    private fun mapToEntity(dto: CourseDTO, courseId: Int = 0): Course = with(dto) { Course(courseId, name, languageA, languageB) }
+    private fun mapToEntity(dto: CourseDTO, author: UserInfo, courseId: Int = 0): Course =
+        with(dto) { Course(courseId, name, author, languageA, languageB) }
 }

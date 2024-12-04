@@ -10,9 +10,9 @@
     align-items: center;
 }
 
-p {
-    font-size: 20px;
-    font-weight: 700;
+.courseName {
+    /*font-size: 20px;*/
+    /*font-weight: 700;*/
     flex: 1 1 2rem;
 }
 

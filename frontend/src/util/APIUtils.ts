@@ -30,6 +30,22 @@ const request = (options: Options) => {
   );
 };
 
+const requestWithoutBearer = (options: Options) => {
+  const headers = new Headers({
+    "Content-Type": "application/json",
+  });
+
+  return fetch(options.url, { headers: headers, ...options }).then((response) =>
+      response.json().then((json) => {
+        if (!response.ok) {
+          return Promise.reject(json);
+        }
+        return json;
+      }),
+  );
+};
+
+
 interface LoginRequest {
   login: string;
   password: string;
@@ -57,7 +73,7 @@ export function login(loginRequest: LoginRequest) {
 interface SignupRequest {}
 
 export function signup(signupRequest: SignupRequest) {
-  return request({
+  return requestWithoutBearer({
     url: API_BASE_URL + "/auth/signup",
     method: "POST",
     body: JSON.stringify(signupRequest),

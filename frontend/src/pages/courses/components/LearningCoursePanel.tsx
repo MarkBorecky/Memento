@@ -1,14 +1,14 @@
-import { CourseInfo } from "./DashboardView";
-import {Button, Flex, Progress, Tooltip} from "antd";
+import { Button, Flex, Progress, Tooltip } from "antd";
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import "./CoursePanel.css";
+import "./LearningCoursePanel.css";
+import { CourseInfo } from "../model/CourseInfo";
 
 interface CoursePanelProps {
   course: CourseInfo;
 }
 
-export const CoursePanel = (props: CoursePanelProps) => {
+export const LearningCoursePanel = (props: CoursePanelProps) => {
   const navigate = useNavigate();
   
   const { learntItems, learningItems, cardsAmount } = props.course;
