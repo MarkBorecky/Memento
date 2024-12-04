@@ -23,6 +23,7 @@ export const CoursePanel = (props: CoursePanelProps) => {
       <div className="nameAndButtons">
         <p>{props.course.name}</p>
         <Button className="learnButton" onClick={() => navigate(`/courses/${props.course.id}/learning`)}>learn</Button>
+        <Button className="learnButton" onClick={() => navigate(`/courses/${props.course.id}`)}>show</Button>
       </div>
       <Flex gap="small" vertical>
           <Tooltip title={`${learntItems} done / ${learningItems} in progress / ${todo} todo`}>
