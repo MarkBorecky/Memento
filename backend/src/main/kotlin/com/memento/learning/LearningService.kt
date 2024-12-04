@@ -29,14 +29,14 @@ class LearningService(
     }
 
     fun getUserLearningCourses(userId: Int): List<CourseDetailsDTO> {
-        return learningFlashCardRepository.getAllLearningCoursesWithDetailsByUserid(userId);
+        return learningFlashCardRepository.getAllLearningCoursesWithDetailsByUserid(userId)
     }
 
     fun getLearningFlashCardSet(userId: Int, courseId: Int, size: Int): List<LearningFlashCardDTO> {
-        val learntAnswerCountBorder = 7
+        val threshold = 7
 
         val projection = learningFlashCardRepository
-            .findFlashCardsToLearnByUserAndCourse(userId, courseId, learntAnswerCountBorder, size)
+            .findFlashCardsToLearnByUserAndCourse(userId, courseId, threshold, size)
 
         return projection.map {
 

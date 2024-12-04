@@ -15,7 +15,7 @@ class CustomLearningFlashCardRepositoryImpl(
     override fun findFlashCardsToLearnByUserAndCourse(
         userId: Int,
         courseId: Int,
-        learntAnswerCountBorder: Int,
+        threshold: Int,
         size: Int
     ): List<FlashCardProjection> {
         return entityManager.createQuery(
@@ -34,12 +34,12 @@ class CustomLearningFlashCardRepositoryImpl(
                 where (
                     coalesce(lfc.id.userId, :userId) = :userId 
                     and coalesce(fc.course.id, :courseId) = :courseId
-                    and coalesce(lfc.correctAnswerCount, 0) < :learntAnswerCountBorder
+                    and coalesce(lfc.correctAnswerCount, 0) < :threshold
                 )
             """.trimIndent(),
             FlashCardProjection::class.java
         )
-            .setParameter("learntAnswerCountBorder", learntAnswerCountBorder)
+            .setParameter("threshold", threshold)
             .setParameter("userId", userId)
             .setParameter("courseId", courseId)
             .setMaxResults(size)
@@ -74,8 +74,8 @@ class CustomLearningFlashCardRepositoryImpl(
             .setParameter("threshold", 2)
             .resultList
 
-        val learningCourses = learningCoursesResults.map { row ->
-            val data = row as Array<Any>
+        val learningCourses = learningCoursesResults.map {
+            val data = it as Array<*>
             LearningDetails(
                 courseId = data[0] as Int,
                 learntItems = (data[1] as Number).toInt(),
