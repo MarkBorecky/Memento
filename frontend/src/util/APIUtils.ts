@@ -80,6 +80,24 @@ export function signup(signupRequest: SignupRequest) {
   });
 }
 
+export enum Language {
+  POLISH, FINNISH, SWEDISH, ENGLISH
+}
+
+export interface CourseRequest {
+  name: string,
+  teachingLanguage: Language,
+  baseLanguage: Language
+}
+
+export function addCourse(courseRequest: CourseRequest) {
+  return request({
+    url: API_BASE_URL + "/courses",
+    method: "POST",
+    body: JSON.stringify(courseRequest),
+  });
+}
+
 export function checkUsernameAvailability(username: string) {
   return request({
     url: API_BASE_URL + "/user/checkUsernameAvailability?username=" + username,

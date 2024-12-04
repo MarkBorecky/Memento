@@ -232,10 +232,10 @@ const Signup: React.FC = () => {
   };
 
   return (
-    <div className="signup-container">
+    <div className="form-container">
       <h1 className="page-title">Sign Up</h1>
-      <div className="signup-content">
-        <Form form={form} onFinish={handleSubmit} className="signup-form">
+      <div className="form-content">
+        <Form form={form} onFinish={handleSubmit} >
           <Form.Item
             label="Username"
             hasFeedback

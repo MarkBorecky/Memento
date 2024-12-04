@@ -11,6 +11,7 @@ import { DashboardView } from "./pages/dashboard/DashboardView";
 import { ACCESS_TOKEN, SESSION_PATH } from "./config";
 import {jwtDecode, JwtPayload} from "jwt-decode";
 import {CoursesView} from "./pages/courses/CoursesView";
+import { CourseForm } from "./pages/courses/CourseForm";
 
 async function getSession(): Promise<User> {
   const token = localStorage.getItem(ACCESS_TOKEN);
@@ -88,6 +89,12 @@ export const App = () => {
       <Route
         path="/courses/:courseId"
         element={<CourseDetails user={user} />}
+      />
+      <Route
+        path="/courses/create"
+        element={goIfAuthenticated(
+            <CourseForm user={user!} />
+        )}
       />
       <Route
         path="/courses/:courseId/learning"

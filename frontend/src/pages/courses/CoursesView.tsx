@@ -47,6 +47,8 @@ export const CoursesView = (props: CoursesProps) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
+  const navigate = useNavigate();
+
   const consumeResult = manageState(setLoading, setCourses, setError);
 
   useEffect(() => {
@@ -68,6 +70,7 @@ export const CoursesView = (props: CoursesProps) => {
   return (
     <div>
       <NavBar isAuthenticated={props.isAuthenticated} />
+      <Button type="primary" onClick={() => navigate("/courses/create")}>Create new course</Button>
       <ul style={{listStyleType: "none"}}>
         {courses.map((course) => (
             <li key={course.id}>
