@@ -16,8 +16,6 @@ export const CoursePanel = (props: CoursePanelProps) => {
   const finished = (learntItems / cardsAmount) * 100;
   const todo = cardsAmount - ( learningItems + learntItems );
 
-  console.log(JSON.stringify(props.course))
-
   return (
     <div className="CoursePanel">
       <div className="nameAndButtons">
