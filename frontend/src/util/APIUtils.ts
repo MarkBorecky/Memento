@@ -86,11 +86,11 @@ export enum Language {
 
 export interface CourseRequest {
   name: string,
-  teachingLanguage: Language,
-  baseLanguage: Language
+  languageA: Language,
+  languageB: Language
 }
 
-export function addCourse(courseRequest: CourseRequest) {
+export function addCourse(courseRequest: CourseRequest): Promise<{id: number}> {
   return request({
     url: API_BASE_URL + "/courses",
     method: "POST",

@@ -28,11 +28,6 @@ interface FieldState {
 
 const Signup: React.FC = () => {
   const [form] = Form.useForm<FormInstance>();
-  const [name, setName] = useState<FieldState>({
-    value: "",
-    validateStatus: "",
-    errorMsg: "",
-  });
   const [username, setUsername] = useState<FieldState>({
     value: "",
     validateStatus: "",
@@ -63,9 +58,6 @@ const Signup: React.FC = () => {
       value: value,
     };
     switch (name) {
-      case "name":
-        setName(state);
-        break;
       case "username":
         setUsername(state);
         break;
@@ -153,7 +145,6 @@ const Signup: React.FC = () => {
 
   const isFormInvalid = () => {
     return !(
-      name.validateStatus === "success" &&
       username.validateStatus === "success" &&
       email.validateStatus === "success" &&
       password.validateStatus === "success"

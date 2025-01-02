@@ -4,6 +4,7 @@ import com.memento.security.UserInfo
 import com.memento.security.UserInfoRepository
 import com.memento.user.UserNotFoundException
 import org.springframework.stereotype.Service
+import java.security.Principal
 
 @Service
 class CourseService(
@@ -11,9 +12,9 @@ class CourseService(
     private val userInfoRepository: UserInfoRepository
 ) {
 
-    fun addCourse(courseDTO: CourseDTO): CourseDTO {
-        val author = userInfoRepository.findByUserName(courseDTO.authorName)
-            .orElseThrow{ throw UserNotFoundException("User with name ${courseDTO.authorName} not found") }
+    fun addCourse(courseDTO: CourseDTO, principal: Principal): CourseDTO {
+        val author = userInfoRepository.findByUserName(principal.name)
+            .orElseThrow{ throw UserNotFoundException("User with name ${principal.name} not found") }
         val course = mapToEntity(courseDTO, author)
         val savedCourse = courseRepository.save(course)
         return CourseDTO(savedCourse)
@@ -25,12 +26,12 @@ class CourseService(
         .map { CourseFullDTO(it) }
         .orElseThrow { CourseNotFoundException("Not found course with id $courseId") }
 
-    fun updateCourse(courseId: Int, courseDTO: CourseDTO): CourseDTO {
+    fun updateCourse(courseId: Int, courseDTO: CourseDTO, principal: Principal): CourseDTO {
         if (!courseRepository.existsById(courseId)) {
             throw CourseNotFoundException("Not found course with id $courseId")
         }
-        val author = userInfoRepository.findByUserName(courseDTO.authorName)
-            .orElseThrow{ throw UserNotFoundException("User with name ${courseDTO.authorName} not found") }
+        val author = userInfoRepository.findByUserName(principal.name)
+            .orElseThrow{ throw UserNotFoundException("User with name ${principal.name} not found") }
         val course = mapToEntity(courseDTO, author, courseId)
         val updatedCourse = courseRepository.save(course)
         return CourseDTO(updatedCourse)
