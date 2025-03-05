@@ -394,7 +394,7 @@ export const LearningView = (props: LearningViewProps) => {
     </div>
   );
 
-  const summaryPanel = session.type === "END_LEARNING_SESSION" && (
+  const endNavigationPanel = session.type === "END_LEARNING_SESSION" && (
     <div>
       {
         <>
@@ -460,7 +460,7 @@ export const LearningView = (props: LearningViewProps) => {
         <div className="right">{progressCircle}</div>
       </div>
       <div className="input">{learningPanel}</div>
-      {summaryPanel}
+      {endNavigationPanel}
     </div>
   );
 };
